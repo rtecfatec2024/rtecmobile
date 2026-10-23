@@ -18,13 +18,13 @@
   </script>
 
   <style>
+    /* ... (Mantenha o CSS idêntico ao anterior) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     html { font-size: 16px; transition: font-size 0.2s ease; }
     html.font-large { font-size: 19px; }
     html.font-xlarge { font-size: 22px; }
     html.daltonism-mode { filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="daltonism"><feColorMatrix type="matrix" values="0.35 0.7 -0.05 0 0 -0.15 1.15 0.05 0 0 0.1 0.1 0.8 0 0 0 0 0 1 0"/></filter></svg>#daltonism') contrast(120%); }
 
-    /* ACESSIBILIDADE E CHATBOT */
     .accessibility-sidebar { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 9999; align-items: flex-end; }
     .accessibility-group { display: flex; flex-direction: row; gap: 0.5rem; background: rgba(0,0,0,0.6); padding: 0.5rem; border-radius: 2rem; backdrop-filter: blur(6px); align-items: center; }
     .acc-btn { background: #ffffff; border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: #0f172a; font-size: 0.875rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.2s; }
@@ -45,7 +45,6 @@
     main { flex: 1; background: #15803d; width: 100%; padding: 6.25rem 1rem 2.5rem 1rem; display: flex; justify-content: center; align-items: center; }
     .content-wrapper { width: 100%; max-width: 28rem; margin: 0 auto; }
 
-    /* ÁREA DO LOGIN */
     .login-card { background: #ffffff; border-radius: 1.75rem; padding: 2.5rem 2rem; box-shadow: 0 15px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; width: 100%; transition: background 0.3s, border-color 0.3s; }
     body.dark-mode .login-card { background: #1e293b; border-color: #334155; }
 
@@ -73,7 +72,6 @@
     .login-links a:hover { text-decoration: underline; }
     body.dark-mode .login-links { color: #94a3b8; }
 
-    /* Header */
     .header-wrap { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
     .header-wrap .topbar { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 0.25rem; padding: 0.375rem 1rem; transition: background 0.3s; }
     .header-wrap .topbar a, .header-wrap .topbar button { background: none; border: none; color: #475569; font-size: 0.78rem; font-weight: 600; text-decoration: none; cursor: pointer; padding: 0.375rem 0.625rem; border-radius: 0.5rem; transition: color 0.2s, background 0.2s; display: flex; align-items: center; }
@@ -103,14 +101,12 @@
     body.dark-mode .header-wrap .mainbar .nav-links { background: #1e293b; }
     body.dark-mode .header-wrap .mainbar .nav-links a:hover { background: #334155; }
 
-    /* VLibras */
     .accessibility-group [vw].enabled { display: flex; align-items: center; justify-content: center; }
     .accessibility-group div[vw-access-button] { position: static !important; width: 2.5rem !important; height: 2.5rem !important; min-width: 2.5rem; margin: 0 !important; border-radius: 0.5rem !important; background: #1351b4 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
     .accessibility-group div[vw-access-button]:hover { transform: scale(1.08); }
     .accessibility-group div[vw-access-button] * { display: none !important; }
     .accessibility-group div[vw-access-button]::before { content: ""; width: 1.75rem; height: 1.75rem; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2a2 2 0 0 1 2 2v6.5l1-.5a1.5 1.5 0 0 1 2.5 1.3v2.2a1.5 1.5 0 0 1-2.5 1.3l-1-.5v1.5a4 4 0 0 1-8 0V9.2a1.5 1.5 0 0 1 2.5-1.3l1 .5V4a2 2 0 0 1 2-2zM6 7a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V8a1 1 0 0 0-1-1zm10 2a1 1 0 0 0-1 1v2a1 1 0 0 0 2 0v-2a1 1 0 0 0-1-1z"/><path d="M12 3a1 1 0 0 0-1 1v9l-2-1V8a1 1 0 0 0-2 0v6.5a3 3 0 0 0 6 0V4a1 1 0 0 0-1-1z"/></svg>') center/contain no-repeat; }
 
-    /* Chatbot Modal */
     .chatbot-modal { position: fixed; bottom: 5rem; right: 6rem; width: 20rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 10000; overflow: hidden; border: 1px solid #e2e8f0; }
     .chatbot-modal.active { display: flex; }
     .chatbot-header { background: #16a34a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
@@ -131,7 +127,6 @@
       .accessibility-sidebar { bottom: 1rem; right: 1rem; }
     }
 
-    /* Rodapé */
     .rtec-footer { position: relative; width: 100%; background: #166534; color: #fff; text-align: center; padding: 2.1rem 1rem 2.75rem; border-top: 0.45rem solid #059669; margin-top: auto; }
     .rtec-footer .footer-social { display: flex; justify-content: center; align-items: center; gap: 1.35rem; margin-bottom: 1.8rem; }
     .rtec-footer .footer-social a { color: #fff; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; transition: transform .2s, color .2s; }
@@ -173,7 +168,7 @@
         <div class="login-card">
           <div class="login-header">
             <h1>Acesse sua Conta</h1>
-            <p>Entre para gerenciar seus agendamentos</p>
+            <p>Entre para gerenciar a plataforma</p>
           </div>
           
           <form id="login-form" onsubmit="realizarLogin(event)">
@@ -191,7 +186,7 @@
               </div>
             </div>
 
-            <button type="submit" class="btn-primary">
+            <button type="submit" class="btn-primary" id="btn-login">
               <span class="material-symbols-outlined">login</span> Entrar
             </button>
           </form>
@@ -255,9 +250,7 @@
         const icon = document.getElementById('dark-icon');
         if (icon) icon.textContent = 'dark_mode';
       }
-      if (localStorage.getItem('rtec_daltonism') === 'true') {
-        document.documentElement.classList.add('daltonism-mode');
-      }
+      if (localStorage.getItem('rtec_daltonism') === 'true') document.documentElement.classList.add('daltonism-mode');
       const fonte = localStorage.getItem('rtec_font');
       if (fonte === 'large') document.documentElement.classList.add('font-large');
       if (fonte === 'xlarge') document.documentElement.classList.add('font-xlarge');
@@ -296,41 +289,54 @@
       document.getElementById('chatbot-modal').classList.toggle('active');
     }
 
-    // LÓGICA DE LOGIN COM SUPABASE
+    // LÓGICA DE LOGIN INTEGRADA (Auth + Busca do Tipo na tbl_usuario)
     async function realizarLogin(event) {
       event.preventDefault();
       
       const email = document.getElementById('login-email').value.trim();
       const senha = document.getElementById('login-senha').value;
-      const btnSubmit = document.querySelector('.btn-primary');
+      const btnSubmit = document.getElementById('btn-login');
       const txtOriginal = btnSubmit.innerHTML;
 
       btnSubmit.innerHTML = 'Entrando...';
       btnSubmit.disabled = true;
 
       try {
-        // Autenticação no Supabase
-        // Nota: Se você estiver usando uma tabela customizada, substitua por um select. 
-        // Aqui estou usando o Auth nativo do Supabase, que é o mais seguro.
-        const { data, error } = await _supabase.auth.signInWithPassword({
+        // 1. Autentica no Supabase Auth
+        const { data: authData, error: authError } = await _supabase.auth.signInWithPassword({
           email: email,
           password: senha
         });
 
-        if (error) throw error;
+        if (authError) throw authError;
 
-        // Salva o estado de login no localStorage para o seu menu personalizado
+        // 2. Busca o tipo de usuário na tabela tbl_usuario
+        const { data: userData, error: userError } = await _supabase
+          .from('tbl_usuario')
+          .select('tipo_usuario')
+          .eq('email_usuario', email)
+          .single();
+
+        if (userError || !userData) {
+          throw new Error('Usuário não encontrado na base de dados relacional.');
+        }
+
+        const perfil = userData.tipo_usuario;
+
+        // 3. Salva estado e redireciona
         localStorage.setItem('rtec_logged', 'true');
-        
-        // Se você tiver o tipo de usuário (coletor, doador, admin) guardado nos metadados, pode salvar aqui
-        // localStorage.setItem('rtec_user_type', data.user.user_metadata.tipo);
+        localStorage.setItem('rtec_user_type', perfil);
 
-        // Redireciona para a página de agendamento (ou painel)
-        window.location.href = 'agendamento.html';
+        if (perfil === 'funcionario') {
+          window.location.href = 'funcionarios.html';
+        } else if (perfil === 'monitor') {
+          window.location.href = 'monitoria.html';
+        } else {
+          alert('Tipo de usuário desconhecido.');
+        }
 
       } catch (err) {
         console.error(err);
-        // Mensagem de erro amigável
         if (err.message.includes('Invalid login credentials')) {
           alert('E-mail ou senha incorretos. Tente novamente.');
         } else {
