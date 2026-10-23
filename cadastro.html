@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+  <title>RTEC - Criar Conta</title>
+  <link rel="icon" href="img/logo.png" type="image/x-icon">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = 'https://lcigujmubajgccnlyzfq.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_VA7m57PV0KTubn7sRyFv8g_Ttk_Ucc4';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    html { font-size: 16px; transition: font-size 0.2s ease; }
+    html.font-large { font-size: 19px; }
+    html.font-xlarge { font-size: 22px; }
+    html.daltonism-mode { filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="daltonism"><feColorMatrix type="matrix" values="0.35 0.7 -0.05 0 0 -0.15 1.15 0.05 0 0 0.1 0.1 0.8 0 0 0 0 0 1 0"/></filter></svg>#daltonism') contrast(120%); }
+
+    /* ACESSIBILIDADE E CHATBOT */
+    .accessibility-sidebar { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 9999; align-items: flex-end; }
+    .accessibility-group { display: flex; flex-direction: row; gap: 0.5rem; background: rgba(0,0,0,0.6); padding: 0.5rem; border-radius: 2rem; backdrop-filter: blur(6px); align-items: center; }
+    .acc-btn { background: #ffffff; border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: #0f172a; font-size: 0.875rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.2s; }
+    .acc-btn:hover { transform: scale(1.08); }
+    
+    .chatbot-float-btn { background: #16a34a; width: 3.8rem; height: 3.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 0 4px #0f172a; border: none; transition: transform 0.2s, background 0.2s; }
+    .chatbot-float-btn:hover { transform: scale(1.05); background: #15803d; }
+    .chatbot-float-btn svg { width: 2.2rem; height: 2.2rem; fill: #ffffff; }
+
+    body { width: 100%; min-height: 100vh; background-color: #15803d; color: #0f172a; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
+    body.dark-mode { background-color: #0f172a; color: #f8fafc; }
+    body.dark-mode .app-container { background: #0f172a; color: #f8fafc; }
+    body.dark-mode main { background: #0f172a; }
+    body.dark-mode .chatbot-float-btn { box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 0 4px #475569; }
+
+    .app-container { width: 100%; min-height: 100vh; background: #15803d; display: flex; flex-direction: column; position: relative; margin: 0; padding: 0; }
+    
+    main { flex: 1; background: #15803d; width: 100%; padding: 6.25rem 1rem 2.5rem 1rem; display: flex; justify-content: center; align-items: center; }
+    .content-wrapper { width: 100%; max-width: 30rem; margin: 0 auto; }
+
+    /* ÁREA DO CADASTRO */
+    .cadastro-card { background: #ffffff; border-radius: 1.75rem; padding: 2.5rem 2rem; box-shadow: 0 15px 40px rgba(0,0,0,0.18); border: 1px solid #e2e8f0; width: 100%; transition: background 0.3s, border-color 0.3s; }
+    body.dark-mode .cadastro-card { background: #1e293b; border-color: #334155; }
+
+    .cadastro-header { text-align: center; margin-bottom: 2rem; }
+    .cadastro-header h1 { font-size: 1.75rem; font-weight: 800; color: #16a34a; margin-bottom: 0.5rem; }
+    .cadastro-header p { font-size: 0.9rem; color: #64748b; }
+    body.dark-mode .cadastro-header h1 { color: #4ade80; }
+    body.dark-mode .cadastro-header p { color: #94a3b8; }
+
+    .input-group { margin-bottom: 1.25rem; }
+    .input-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #334155; margin-bottom: 0.375rem; display: flex; align-items: center; gap: 0.375rem; }
+    .input-group label .material-symbols-outlined { font-size: 1.125rem; color: #16a34a; }
+    .input-wrapper { position: relative; display: flex; align-items: center; width: 100%; }
+    .input-wrapper input, .input-wrapper select { width: 100%; height: 3.25rem; padding: 0 1rem; border: 1px solid #cbd5e1; border-radius: 0.875rem; font-size: 0.9rem; color: #0f172a; outline: none; background: #ffffff; font-weight: 500; appearance: none; }
+    .input-wrapper select { padding-right: 2.5rem; }
+    .input-wrapper input:focus, .input-wrapper select:focus { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.12); }
+    .input-wrapper .select-icon { position: absolute; right: 1rem; pointer-events: none; color: #64748b; font-size: 1.25rem; }
+    
+    body.dark-mode .input-group label { color: #cbd5e1; }
+    body.dark-mode .input-wrapper input, body.dark-mode .input-wrapper select { background: #0f172a; border-color: #334155; color: #f8fafc; }
+    body.dark-mode .input-wrapper .select-icon { color: #94a3b8; }
+
+    /* CHECKBOX DE TERMOS */
+    .terms-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: #334155;
+      line-height: 1.4;
+    }
+    body.dark-mode .terms-group { color: #cbd5e1; }
+    
+    .terms-group input[type="checkbox"] {
+      margin-top: 0.2rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      accent-color: #16a34a;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    
+    .terms-link {
+      color: #16a34a;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .terms-link:hover { text-decoration: underline; }
+    body.dark-mode .terms-link { color: #4ade80; }
+
+    .btn-primary { width: 100%; height: 3.25rem; background: #16a34a; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.35); transition: background 0.2s, opacity 0.2s; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary:hover:not(:disabled) { background: #15803d; }
+
+    .cadastro-links { text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: #64748b; }
+    .cadastro-links a { color: #16a34a; font-weight: 700; text-decoration: none; }
+    .cadastro-links a:hover { text-decoration: underline; }
+    body.dark-mode .cadastro-links { color: #94a3b8; }
+
+    /* MODAL DE TERMOS */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: #ffffff; border-radius: 1.5rem; max-width: 32rem; width: 100%; max-height: 85vh; display: flex; flex-direction: column; color: #0f172a; }
+    body.dark-mode .modal-content { background: #1e293b; color: #f8fafc; border: 1px solid #334155; }
+    .modal-header { padding: 1.5rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+    body.dark-mode .modal-header { border-bottom-color: #334155; }
+    .modal-header h2 { font-size: 1.25rem; font-weight: 800; color: #16a34a; }
+    body.dark-mode .modal-header h2 { color: #4ade80; }
+    .modal-header button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+    .modal-body { padding: 1.5rem; overflow-y: auto; font-size: 0.9rem; line-height: 1.6; color: #475569; }
+    body.dark-mode .modal-body { color: #cbd5e1; }
+    .modal-body h3 { font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #0f172a; }
+    body.dark-mode .modal-body h3 { color: #f8fafc; }
+    .modal-body p { margin-bottom: 0.75rem; }
+    .modal-body ul { margin-left: 1.5rem; margin-bottom: 0.75rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; }
+    body.dark-mode .modal-footer { border-top-color: #334155; }
+    .btn-modal { background: #16a34a; color: #ffffff; border: none; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; }
+    .btn-modal:hover { background: #15803d; }
+
+    /* Header & Footer */
+    .header-wrap { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
+    .header-wrap .topbar { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 0.25rem; padding: 0.375rem 1rem; transition: background 0.3s; }
+    .header-wrap .topbar a, .header-wrap .topbar button { background: none; border: none; color: #475569; font-size: 0.78rem; font-weight: 600; text-decoration: none; cursor: pointer; padding: 0.375rem 0.625rem; border-radius: 0.5rem; transition: color 0.2s, background 0.2s; display: flex; align-items: center; }
+    .header-wrap .topbar a:hover, .header-wrap .topbar button:hover { color: #0f172a; background: #e2e8f0; }
+    .header-wrap .mainbar { background: #ffffff; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.08); transition: background 0.3s; }
+    .header-wrap .mainbar .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .header-wrap .mainbar .nav-links a { color: #334155; text-decoration: none; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; transition: color 0.2s; }
+    .header-wrap .mainbar .nav-links a:hover, .header-wrap .mainbar .nav-links a.active { color: #16a34a; }
+    .header-wrap .hamburger { display: none; background: #f1f5f9; border: 1px solid #e2e8f0; color: #334155; width: 2.5rem; height: 2.5rem; border-radius: 0.625rem; align-items: center; justify-content: center; cursor: pointer; }
+    
+    @media (max-width: 768px) {
+      .header-wrap .topbar .btn-cadastro { display: none; }
+      .header-wrap .mainbar .nav-links { display: none; position: fixed; top: 6.1rem; left: 0; width: 100%; background: #ffffff; flex-direction: column; align-items: stretch; padding: 1rem; gap: 0.25rem; border-bottom: 3px solid #16a34a; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+      .header-wrap .mainbar .nav-links.open { display: flex; }
+      .header-wrap .mainbar .nav-links a { padding: 0.875rem 1rem; border-radius: 0.625rem; }
+      .header-wrap .mainbar .nav-links a:hover { background: #f1f5f9; }
+      .header-wrap .mainbar .nav-links .btn-cadastro-mobile { display: block !important; }
+      .header-wrap .hamburger { display: flex !important; }
+    }
+    body.dark-mode .header-wrap .topbar { background: #0b1220; border-bottom-color: #1e293b; }
+    body.dark-mode .header-wrap .topbar a, body.dark-mode .header-wrap .topbar button { color: #94a3b8; }
+    body.dark-mode .header-wrap .topbar a:hover, body.dark-mode .header-wrap .topbar button:hover { color: #ffffff; background: #1e293b; }
+    body.dark-mode .header-wrap .mainbar { background: #1e293b; border-bottom-color: #334155; }
+    body.dark-mode .header-wrap .mainbar .nav-links a { color: #e5e7eb; }
+    body.dark-mode .header-wrap .mainbar .nav-links a:hover, body.dark-mode .header-wrap .mainbar .nav-links a.active { color: #4ade80; }
+    body.dark-mode .header-wrap .hamburger { background: rgba(255,255,255,0.1); border-color: transparent; color: #ffffff; }
+    body.dark-mode .header-wrap .mainbar .nav-links { background: #1e293b; }
+    body.dark-mode .header-wrap .mainbar .nav-links a:hover { background: #334155; }
+
+    /* VLibras */
+    .accessibility-group [vw].enabled { display: flex; align-items: center; justify-content: center; }
+    .accessibility-group div[vw-access-button] { position: static !important; width: 2.5rem !important; height: 2.5rem !important; min-width: 2.5rem; margin: 0 !important; border-radius: 0.5rem !important; background: #1351b4 !important; box-shadow: 0 2px 6px rgba(0,0,0,0.2); cursor: pointer; transition: transform 0.2s; display: flex; align-items: center; justify-content: center; }
+    .accessibility-group div[vw-access-button]:hover { transform: scale(1.08); }
+    .accessibility-group div[vw-access-button] * { display: none !important; }
+    .accessibility-group div[vw-access-button]::before { content: ""; width: 1.75rem; height: 1.75rem; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2a2 2 0 0 1 2 2v6.5l1-.5a1.5 1.5 0 0 1 2.5 1.3v2.2a1.5 1.5 0 0 1-2.5 1.3l-1-.5v1.5a4 4 0 0 1-8 0V9.2a1.5 1.5 0 0 1 2.5-1.3l1 .5V4a2 2 0 0 1 2-2zM6 7a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V8a1 1 0 0 0-1-1zm10 2a1 1 0 0 0-1 1v2a1 1 0 0 0 2 0v-2a1 1 0 0 0-1-1z"/><path d="M12 3a1 1 0 0 0-1 1v9l-2-1V8a1 1 0 0 0-2 0v6.5a3 3 0 0 0 6 0V4a1 1 0 0 0-1-1z"/></svg>') center/contain no-repeat; }
+
+    /* Chatbot Modal */
+    .chatbot-modal { position: fixed; bottom: 5rem; right: 6rem; width: 20rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 10000; overflow: hidden; border: 1px solid #e2e8f0; }
+    .chatbot-modal.active { display: flex; }
+    .chatbot-header { background: #16a34a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+    .chatbot-header button { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; }
+    .chatbot-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; max-height: 20rem; overflow-y: auto; background: #f8fafc; }
+    .chatbot-message { background: #e2e8f0; padding: 0.75rem; border-radius: 0.75rem; font-size: 0.85rem; color: #1e293b; align-self: flex-start; max-width: 90%; }
+    .chatbot-footer { padding: 0.75rem; display: flex; gap: 0.5rem; background: #ffffff; border-top: 1px solid #e2e8f0; }
+    .chatbot-footer input { flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.85rem; outline: none; }
+    .chatbot-footer button { background: #16a34a; color: white; border: none; border-radius: 0.5rem; padding: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    body.dark-mode .chatbot-modal { background: #1e293b; border-color: #334155; }
+    body.dark-mode .chatbot-body { background: #0f172a; }
+    body.dark-mode .chatbot-message { background: #334155; color: #f8fafc; }
+    body.dark-mode .chatbot-footer { background: #1e293b; border-top-color: #334155; }
+    body.dark-mode .chatbot-footer input { background: #0f172a; border-color: #334155; color: #f8fafc; }
+
+    @media (max-width: 500px) {
+      .chatbot-modal { width: calc(100vw - 2rem); right: 1rem; bottom: 6rem; }
+      .accessibility-sidebar { bottom: 1rem; right: 1rem; }
+    }
+
+    /* Rodapé */
+    .rtec-footer { position: relative; width: 100%; background: #166534; color: #fff; text-align: center; padding: 2.1rem 1rem 2.75rem; border-top: 0.45rem solid #059669; margin-top: auto; }
+    .rtec-footer .footer-social { display: flex; justify-content: center; align-items: center; gap: 1.35rem; margin-bottom: 1.8rem; }
+    .rtec-footer .footer-social a { color: #fff; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; transition: transform .2s, color .2s; }
+    .rtec-footer .footer-social a:hover { color: #bbf7d0; transform: translateY(-2px); }
+    .rtec-footer .footer-social .material-symbols-outlined { font-size: 1.9rem; }
+    .rtec-footer .footer-social svg { width: 1.55rem; height: 1.55rem; fill: currentColor; }
+    .rtec-footer .copyright { font-size: 1.05rem; font-weight: 600; margin-bottom: .85rem; }
+    .rtec-footer .footer-tagline { color: #a7f3d0; font-size: .95rem; }
+    body.dark-mode .rtec-footer { background: #14532d; border-top-color: #059669; }
+    @media (max-width: 480px) { .rtec-footer { padding: 1.6rem 1rem 2rem; } .rtec-footer .copyright { font-size: .9rem; } .rtec-footer .footer-tagline { font-size: .85rem; } .rtec-footer .footer-social { margin-bottom: 1.35rem; } }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header-wrap">
+      <div class="topbar">
+        <button onclick="toggleDarkMode()" title="Modo Claro/Escuro"><span class="material-symbols-outlined" id="dark-icon" style="font-size:1.1rem;">light_mode</span></button>
+        <a href="login.html">Entrar</a>
+        <a href="cadastro.html" class="btn-cadastro active">Cadastre-se</a>
+      </div>
+      <div class="mainbar">
+        <a href="index.html"><img src="img/logo.png" alt="RTEC" style="height:2.25rem;"></a>
+        <nav class="nav-links" id="navLinks">
+          <a href="agendamento.html">AGENDAMENTO</a>
+          <a href="operacional.html">COLETORES</a>
+          <a href="index.html">SOBRE</a>
+          <a href="feedback.html">FEEDBACKS</a>
+          <a href="cadastro.html" class="btn-cadastro-mobile" style="display:none;">CADASTRE-SE</a>
+        </nav>
+        <button class="hamburger" aria-label="Abrir menu" onclick="document.getElementById('navLinks').classList.toggle('open')">
+          <span class="material-symbols-outlined">menu</span>
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <div class="content-wrapper">
+        <div class="cadastro-card">
+          <div class="cadastro-header">
+            <h1>Crie sua Conta</h1>
+            <p>Junte-se a nós para um futuro mais sustentável</p>
+          </div>
+          
+          <form id="cadastro-form" onsubmit="realizarCadastro(event)">
+            <div class="input-group">
+              <label><span class="material-symbols-outlined">person</span> Nome Completo</label>
+              <div class="input-wrapper">
+                <input type="text" id="cad-nome" placeholder="Digite seu nome" required>
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label><span class="material-symbols-outlined">mail</span> E-mail</label>
+              <div class="input-wrapper">
+                <input type="email" id="cad-email" placeholder="seu.email@exemplo.com" required>
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label><span class="material-symbols-outlined">lock</span> Senha</label>
+              <div class="input-wrapper">
+                <input type="password" id="cad-senha" placeholder="Crie uma senha (min. 6 caracteres)" required minlength="6">
+              </div>
+            </div>
+
+            <div class="input-group">
+              <label><span class="material-symbols-outlined">badge</span> Tipo de Conta</label>
+              <div class="input-wrapper">
+                <select id="cad-perfil" required>
+                  <option value="" disabled selected>Selecione uma opção</option>
+                  <option value="funcionario">Funcionário (Painel Admin)</option>
+                  <option value="monitor">Monitor (Triagem)</option>
+                </select>
+                <span class="material-symbols-outlined select-icon">expand_more</span>
+              </div>
+            </div>
+
+            <!-- Checkbox de Termos -->
+            <div class="terms-group">
+              <input type="checkbox" id="aceite-termos" required onchange="toggleBotaoCadastro()">
+              <label for="aceite-termos" style="cursor:pointer; font-weight: 400;">
+                Eu li, entendi e concordo com as <a href="#" class="terms-link" onclick="event.preventDefault(); abrirTermos();">Práticas de Segurança e Consentimento de Uso de Dados</a>.
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btn-cadastrar" disabled>
+              <span class="material-symbols-outlined">person_add</span> Criar Conta
+            </button>
+          </form>
+
+          <div class="cadastro-links">
+            Já tem uma conta? <a href="login.html">Faça login</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL DE TERMOS DE SEGURANÇA -->
+  <div class="modal-overlay" id="modal-termos">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Segurança e Privacidade</h2>
+        <button onclick="fecharTermos()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Para nós, a sua segurança e privacidade são prioridades. Queremos que você entenda de forma clara como cuidamos dos seus dados e como nosso site funciona.</p>
+        
+        <h3>1. Nosso Compromisso com a Segurança:</h3>
+        <ul>
+          <li><strong>Proteção de Dados:</strong> Usamos medidas de segurança, como criptografia e controle de acesso, para proteger suas informações contra acessos não autorizados, perdas ou fraudes.</li>
+          <li><strong>Confidencialidade:</strong> Jamais venderemos ou alugaremos seus dados pessoais. Eles são usados exclusivamente para o funcionamento do nosso serviço.</li>
+        </ul>
+
+        <h3>2. Como Usamos Seus Dados (Seu Consentimento):</h3>
+        <p>Ao criar sua conta, coletamos algumas informações para que o serviço funcione bem. Veja para quê:</p>
+        <ul>
+          <li><strong>Dados de Cadastro (Nome, E-mail):</strong> Usamos para identificar você, permitir o acesso à sua conta e enviar comunicações importantes sobre o serviço.</li>
+          <li><strong>Dados de Navegação (IP, páginas visitadas):</strong> Usamos de forma anônima para entender como nosso site é utilizado, melhorar sua experiência e garantir a segurança da plataforma contra atividades suspeitas.</li>
+        </ul>
+
+        <h3>3. Suas Responsabilidades:</h3>
+        <ul>
+          <li><strong>Senha Segura:</strong> Sua senha é pessoal e intransferível. Crie uma senha forte e não a compartilhe com ninguém.</li>
+          <li><strong>Uso Consciente:</strong> Utilize nosso site de forma ética e legal, respeitando os outros usuários.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal" onclick="aceitarTermosModal()">Li e Concordo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="chatbot-modal" id="chatbot-modal">
+    <div class="chatbot-header">
+      <span>Assistente Virtual</span>
+      <button onclick="toggleChat()">&times;</button>
+    </div>
+    <div class="chatbot-body">
+      <div class="chatbot-message">Olá! Sou seu assistente virtual. Como posso ajudar?</div>
+    </div>
+    <div class="chatbot-footer">
+      <input type="text" placeholder="Digite sua mensagem..." />
+      <button><span class="material-symbols-outlined">send</span></button>
+    </div>
+  </div>
+
+  <footer class="rtec-footer">
+    <div class="footer-social" aria-label="Redes e site do RTEC">
+      <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.8 2h8.4A5.8 5.8 0 0 1 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8A5.8 5.8 0 0 1 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2zm0 2A3.8 3.8 0 0 0 4 7.8v8.4A3.8 3.8 0 0 0 7.8 20h8.4a3.8 3.8 0 0 0 3.8-3.8V7.8A3.8 3.8 0 0 0 16.2 4H7.8zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.2-3.3a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg>
+      </a>
+      <a href="https://www.youtube.com/" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.6 15.6V8.4l6.2 3.6-6.2 3.6z"/></svg>
+      </a>
+      <a href="index.html" aria-label="Página inicial do RTEC"><span class="material-symbols-outlined">language</span></a>
+    </div>
+    <p class="copyright">© 2024 RTEC - Todos os direitos reservados</p>
+    <p class="footer-tagline">Contribuindo para um futuro mais sustentável</p>
+  </footer>
+
+  <div class="accessibility-sidebar">
+    <div class="accessibility-group">
+      <button class="acc-btn" onclick="mudarFonte()" title="Aumentar / Reduzir Fonte">A+</button>
+      <button class="acc-btn" onclick="toggleDaltonismoAPI()" title="API Filtro Daltonismo"><span class="material-symbols-outlined" style="font-size:1.125rem;">visibility</span></button>
+      <div vw class="enabled" title="VLibras - Libras"></div>
+    </div>
+    <button class="chatbot-float-btn" onclick="toggleChat()" title="Abrir Assistente Virtual">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.5 10.5C16.5 11.3284 15.8284 12 15 12C14.1716 12 13.5 11.3284 13.5 10.5C13.5 9.67157 14.1716 9 15 9C15.8284 9 16.5 9.67157 16.5 10.5ZM10.5 12C11.3284 12 12 11.3284 12 10.5C12 9.67157 11.3284 9 10.5 9C9.67157 9 9 9.67157 9 10.5C9 11.3284 9.67157 12 10.5 12Z"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C10.5191 20 9.12767 19.5968 7.9224 18.8954L4.31995 19.6801L5.10456 16.0776C4.40316 14.8723 4 13.4809 4 12Z"/>
+        <path d="M20.5 10C20.5 10.8284 19.8284 11.5 19 11.5C18.1716 11.5 17.5 10.8284 17.5 10C17.5 9.17157 18.1716 8.5 19 8.5C19.8284 8.5 20.5 9.17157 20.5 10ZM19 15C19.8284 15 20.5 14.3284 20.5 13.5C20.5 12.6716 19.8284 12 19 12C18.1716 12 17.5 12.6716 17.5 13.5C17.5 14.3284 18.1716 15 19 15Z"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22C17.5228 22 22 17.5228 22 12ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C10.5191 20 9.12767 19.5968 7.9224 18.8954L4.31995 19.6801L5.10456 16.0776C4.40316 14.8723 4 13.4809 4 12C4 7.58172 7.58172 4 12 4Z"/>
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    function aplicarConfiguracoesGlobais() {
+      if (localStorage.getItem('rtec_dark') === 'true') {
+        document.body.classList.add('dark-mode');
+        const icon = document.getElementById('dark-icon');
+        if (icon) icon.textContent = 'dark_mode';
+      }
+      if (localStorage.getItem('rtec_daltonism') === 'true') document.documentElement.classList.add('daltonism-mode');
+      const fonte = localStorage.getItem('rtec_font');
+      if (fonte === 'large') document.documentElement.classList.add('font-large');
+      if (fonte === 'xlarge') document.documentElement.classList.add('font-xlarge');
+    }
+    window.addEventListener('DOMContentLoaded', aplicarConfiguracoesGlobais);
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const isDark = document.body.classList.contains('dark-mode');
+      localStorage.setItem('rtec_dark', isDark);
+      const icon = document.getElementById('dark-icon');
+      if (icon) icon.textContent = isDark ? 'dark_mode' : 'light_mode';
+    }
+
+    async function toggleDaltonismoAPI() {
+      document.documentElement.classList.toggle('daltonism-mode');
+      localStorage.setItem('rtec_daltonism', document.documentElement.classList.contains('daltonism-mode'));
+    }
+
+    function mudarFonte() {
+      const htmlEl = document.documentElement;
+      if (!htmlEl.classList.contains('font-large') && !htmlEl.classList.contains('font-xlarge')) {
+        htmlEl.classList.add('font-large');
+        localStorage.setItem('rtec_font', 'large');
+      } else if (htmlEl.classList.contains('font-large')) {
+        htmlEl.classList.remove('font-large');
+        htmlEl.classList.add('font-xlarge');
+        localStorage.setItem('rtec_font', 'xlarge');
+      } else {
+        htmlEl.classList.remove('font-xlarge');
+        localStorage.setItem('rtec_font', 'normal');
+      }
+    }
+
+    function toggleChat() {
+      document.getElementById('chatbot-modal').classList.toggle('active');
+    }
+
+    // LÓGICA DOS TERMOS DE USO
+    function abrirTermos() {
+      document.getElementById('modal-termos').classList.add('active');
+    }
+
+    function fecharTermos() {
+      document.getElementById('modal-termos').classList.remove('active');
+    }
+
+    function aceitarTermosModal() {
+      document.getElementById('aceite-termos').checked = true;
+      toggleBotaoCadastro();
+      fecharTermos();
+    }
+
+    function toggleBotaoCadastro() {
+      const check = document.getElementById('aceite-termos').checked;
+      document.getElementById('btn-cadastrar').disabled = !check;
+    }
+
+    // LÓGICA DE CADASTRO
+    async function realizarCadastro(event) {
+      event.preventDefault();
+      
+      if (!document.getElementById('aceite-termos').checked) {
+        alert('Você precisa aceitar os termos de uso para continuar.');
+        return;
+      }
+
+      const nomeCompleto = document.getElementById('cad-nome').value.trim();
+      const email = document.getElementById('cad-email').value.trim();
+      const senha = document.getElementById('cad-senha').value;
+      const perfil = document.getElementById('cad-perfil').value; 
+
+      const partesNome = nomeCompleto.split(' ');
+      const nome = partesNome[0];
+      const sobrenome = partesNome.length > 1 ? partesNome.slice(1).join(' ') : ' ';
+
+      const btnSubmit = document.getElementById('btn-cadastrar');
+      const txtOriginal = btnSubmit.innerHTML;
+
+      btnSubmit.innerHTML = 'Criando conta...';
+      btnSubmit.disabled = true;
+
+      try {
+        const { data: authData, error: authError } = await _supabase.auth.signUp({
+          email: email,
+          password: senha,
+          options: {
+            data: { nome_completo: nomeCompleto, tipo_usuario: perfil }
+          }
+        });
+
+        if (authError) throw authError;
+
+        if (authData.user) {
+          const { error: dbError } = await _supabase.from('tbl_usuario').insert([{
+            nome_usuario: nome,
+            sobrenome_usuario: sobrenome,
+            email_usuario: email,
+            senha_usuario: 'GERENCIADO_PELO_AUTH', 
+            tipo_usuario: perfil
+          }]);
+
+          if (dbError) throw dbError;
+
+          localStorage.setItem('rtec_logged', 'true');
+          localStorage.setItem('rtec_user_type', perfil);
+          
+          alert('Conta criada com sucesso! Bem-vindo(a) à RTEC.');
+          
+          if (perfil === 'funcionario') {
+            window.location.href = 'funcionarios.html';
+          } else {
+            window.location.href = 'monitoria.html';
+          }
+        }
+      } catch (err) {
+        console.error(err);
+        if (err.message.includes('User already registered')) {
+          alert('Este e-mail já está cadastrado. Tente fazer login.');
+        } else {
+          alert('Erro ao criar conta: ' + err.message);
+        }
+      } finally {
+        btnSubmit.innerHTML = txtOriginal;
+        toggleBotaoCadastro();
+      }
+    }
+  </script>
+
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new window.VLibras.Widget('https://vlibras.gov.br/app');</script>
+</body>
+</html>
