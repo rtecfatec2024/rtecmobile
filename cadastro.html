@@ -68,13 +68,65 @@
     body.dark-mode .input-wrapper input, body.dark-mode .input-wrapper select { background: #0f172a; border-color: #334155; color: #f8fafc; }
     body.dark-mode .input-wrapper .select-icon { color: #94a3b8; }
 
-    .btn-primary { width: 100%; height: 3.25rem; background: #16a34a; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.35); margin-top: 1rem; transition: background 0.2s; }
-    .btn-primary:hover { background: #15803d; }
+    /* CHECKBOX DE TERMOS */
+    .terms-group {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      color: #334155;
+      line-height: 1.4;
+    }
+    body.dark-mode .terms-group { color: #cbd5e1; }
+    
+    .terms-group input[type="checkbox"] {
+      margin-top: 0.2rem;
+      width: 1.25rem;
+      height: 1.25rem;
+      accent-color: #16a34a;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    
+    .terms-link {
+      color: #16a34a;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .terms-link:hover { text-decoration: underline; }
+    body.dark-mode .terms-link { color: #4ade80; }
+
+    .btn-primary { width: 100%; height: 3.25rem; background: #16a34a; color: white; border: none; border-radius: 0.875rem; font-weight: 700; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(22, 163, 74, 0.35); transition: background 0.2s, opacity 0.2s; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary:hover:not(:disabled) { background: #15803d; }
 
     .cadastro-links { text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: #64748b; }
     .cadastro-links a { color: #16a34a; font-weight: 700; text-decoration: none; }
     .cadastro-links a:hover { text-decoration: underline; }
     body.dark-mode .cadastro-links { color: #94a3b8; }
+
+    /* MODAL DE TERMOS */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 10000; padding: 1rem; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: #ffffff; border-radius: 1.5rem; max-width: 32rem; width: 100%; max-height: 85vh; display: flex; flex-direction: column; color: #0f172a; }
+    body.dark-mode .modal-content { background: #1e293b; color: #f8fafc; border: 1px solid #334155; }
+    .modal-header { padding: 1.5rem 1.5rem 1rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; }
+    body.dark-mode .modal-header { border-bottom-color: #334155; }
+    .modal-header h2 { font-size: 1.25rem; font-weight: 800; color: #16a34a; }
+    body.dark-mode .modal-header h2 { color: #4ade80; }
+    .modal-header button { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #64748b; }
+    .modal-body { padding: 1.5rem; overflow-y: auto; font-size: 0.9rem; line-height: 1.6; color: #475569; }
+    body.dark-mode .modal-body { color: #cbd5e1; }
+    .modal-body h3 { font-size: 1rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; color: #0f172a; }
+    body.dark-mode .modal-body h3 { color: #f8fafc; }
+    .modal-body p { margin-bottom: 0.75rem; }
+    .modal-body ul { margin-left: 1.5rem; margin-bottom: 0.75rem; }
+    .modal-footer { padding: 1rem 1.5rem; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; }
+    body.dark-mode .modal-footer { border-top-color: #334155; }
+    .btn-modal { background: #16a34a; color: #ffffff; border: none; padding: 0.75rem 1.5rem; border-radius: 0.75rem; font-weight: 700; cursor: pointer; }
+    .btn-modal:hover { background: #15803d; }
 
     /* Header & Footer */
     .header-wrap { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
@@ -206,14 +258,22 @@
               <div class="input-wrapper">
                 <select id="cad-perfil" required>
                   <option value="" disabled selected>Selecione uma opção</option>
-                  <option value="Doador">Sou Doador (Quero agendar coletas)</option>
-                  <option value="Coletor">Sou Coletor (Quero receber coletas)</option>
+                  <option value="funcionario">Funcionário (Painel Admin)</option>
+                  <option value="monitor">Monitor (Triagem)</option>
                 </select>
                 <span class="material-symbols-outlined select-icon">expand_more</span>
               </div>
             </div>
 
-            <button type="submit" class="btn-primary">
+            <!-- Checkbox de Termos -->
+            <div class="terms-group">
+              <input type="checkbox" id="aceite-termos" required onchange="toggleBotaoCadastro()">
+              <label for="aceite-termos" style="cursor:pointer; font-weight: 400;">
+                Eu li, entendi e concordo com as <a href="#" class="terms-link" onclick="event.preventDefault(); abrirTermos();">Práticas de Segurança e Consentimento de Uso de Dados</a>.
+              </label>
+            </div>
+
+            <button type="submit" class="btn-primary" id="btn-cadastrar" disabled>
               <span class="material-symbols-outlined">person_add</span> Criar Conta
             </button>
           </form>
@@ -224,6 +284,41 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- MODAL DE TERMOS DE SEGURANÇA -->
+  <div class="modal-overlay" id="modal-termos">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Segurança e Privacidade</h2>
+        <button onclick="fecharTermos()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Para nós, a sua segurança e privacidade são prioridades. Queremos que você entenda de forma clara como cuidamos dos seus dados e como nosso site funciona.</p>
+        
+        <h3>1. Nosso Compromisso com a Segurança:</h3>
+        <ul>
+          <li><strong>Proteção de Dados:</strong> Usamos medidas de segurança, como criptografia e controle de acesso, para proteger suas informações contra acessos não autorizados, perdas ou fraudes.</li>
+          <li><strong>Confidencialidade:</strong> Jamais venderemos ou alugaremos seus dados pessoais. Eles são usados exclusivamente para o funcionamento do nosso serviço.</li>
+        </ul>
+
+        <h3>2. Como Usamos Seus Dados (Seu Consentimento):</h3>
+        <p>Ao criar sua conta, coletamos algumas informações para que o serviço funcione bem. Veja para quê:</p>
+        <ul>
+          <li><strong>Dados de Cadastro (Nome, E-mail):</strong> Usamos para identificar você, permitir o acesso à sua conta e enviar comunicações importantes sobre o serviço.</li>
+          <li><strong>Dados de Navegação (IP, páginas visitadas):</strong> Usamos de forma anônima para entender como nosso site é utilizado, melhorar sua experiência e garantir a segurança da plataforma contra atividades suspeitas.</li>
+        </ul>
+
+        <h3>3. Suas Responsabilidades:</h3>
+        <ul>
+          <li><strong>Senha Segura:</strong> Sua senha é pessoal e intransferível. Crie uma senha forte e não a compartilhe com ninguém.</li>
+          <li><strong>Uso Consciente:</strong> Utilize nosso site de forma ética e legal, respeitando os outros usuários.</li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-modal" onclick="aceitarTermosModal()">Li e Concordo</button>
+      </div>
+    </div>
   </div>
 
   <div class="chatbot-modal" id="chatbot-modal">
@@ -277,9 +372,7 @@
         const icon = document.getElementById('dark-icon');
         if (icon) icon.textContent = 'dark_mode';
       }
-      if (localStorage.getItem('rtec_daltonism') === 'true') {
-        document.documentElement.classList.add('daltonism-mode');
-      }
+      if (localStorage.getItem('rtec_daltonism') === 'true') document.documentElement.classList.add('daltonism-mode');
       const fonte = localStorage.getItem('rtec_font');
       if (fonte === 'large') document.documentElement.classList.add('font-large');
       if (fonte === 'xlarge') document.documentElement.classList.add('font-xlarge');
@@ -318,49 +411,81 @@
       document.getElementById('chatbot-modal').classList.toggle('active');
     }
 
-    // LÓGICA DE CADASTRO COM SUPABASE
+    // LÓGICA DOS TERMOS DE USO
+    function abrirTermos() {
+      document.getElementById('modal-termos').classList.add('active');
+    }
+
+    function fecharTermos() {
+      document.getElementById('modal-termos').classList.remove('active');
+    }
+
+    function aceitarTermosModal() {
+      document.getElementById('aceite-termos').checked = true;
+      toggleBotaoCadastro();
+      fecharTermos();
+    }
+
+    function toggleBotaoCadastro() {
+      const check = document.getElementById('aceite-termos').checked;
+      document.getElementById('btn-cadastrar').disabled = !check;
+    }
+
+    // LÓGICA DE CADASTRO
     async function realizarCadastro(event) {
       event.preventDefault();
       
-      const nome = document.getElementById('cad-nome').value.trim();
+      if (!document.getElementById('aceite-termos').checked) {
+        alert('Você precisa aceitar os termos de uso para continuar.');
+        return;
+      }
+
+      const nomeCompleto = document.getElementById('cad-nome').value.trim();
       const email = document.getElementById('cad-email').value.trim();
       const senha = document.getElementById('cad-senha').value;
-      const perfil = document.getElementById('cad-perfil').value;
+      const perfil = document.getElementById('cad-perfil').value; 
 
-      const btnSubmit = document.querySelector('.btn-primary');
+      const partesNome = nomeCompleto.split(' ');
+      const nome = partesNome[0];
+      const sobrenome = partesNome.length > 1 ? partesNome.slice(1).join(' ') : ' ';
+
+      const btnSubmit = document.getElementById('btn-cadastrar');
       const txtOriginal = btnSubmit.innerHTML;
 
       btnSubmit.innerHTML = 'Criando conta...';
       btnSubmit.disabled = true;
 
       try {
-        // Cria o usuário no Supabase Auth
-        const { data, error } = await _supabase.auth.signUp({
+        const { data: authData, error: authError } = await _supabase.auth.signUp({
           email: email,
           password: senha,
           options: {
-            data: {
-              nome_completo: nome,
-              tipo_usuario: perfil // Salva se é Doador ou Coletor
-            }
+            data: { nome_completo: nomeCompleto, tipo_usuario: perfil }
           }
         });
 
-        if (error) throw error;
+        if (authError) throw authError;
 
-        // Se o Supabase exigir confirmação de e-mail, data.user estará presente mas não logado.
-        // Se não exigir, o login é feito automaticamente. 
-        // Vamos salvar o estado de logado para o seu menu.
-        if (data.user) {
+        if (authData.user) {
+          const { error: dbError } = await _supabase.from('tbl_usuario').insert([{
+            nome_usuario: nome,
+            sobrenome_usuario: sobrenome,
+            email_usuario: email,
+            senha_usuario: 'GERENCIADO_PELO_AUTH', 
+            tipo_usuario: perfil
+          }]);
+
+          if (dbError) throw dbError;
+
           localStorage.setItem('rtec_logged', 'true');
           localStorage.setItem('rtec_user_type', perfil);
           
           alert('Conta criada com sucesso! Bem-vindo(a) à RTEC.');
-          // Redireciona baseado no perfil
-          if (perfil === 'Coletor') {
-            window.location.href = 'operacional.html';
+          
+          if (perfil === 'funcionario') {
+            window.location.href = 'funcionarios.html';
           } else {
-            window.location.href = 'agendamento.html';
+            window.location.href = 'monitoria.html';
           }
         }
       } catch (err) {
@@ -372,7 +497,7 @@
         }
       } finally {
         btnSubmit.innerHTML = txtOriginal;
-        btnSubmit.disabled = false;
+        toggleBotaoCadastro();
       }
     }
   </script>
