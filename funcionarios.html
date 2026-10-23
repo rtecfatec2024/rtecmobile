@@ -12,9 +12,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    if (localStorage.getItem('rtec_logged') !== 'true') {
-      window.location.href = 'index.html';
+    if (localStorage.getItem('rtec_logged') !== 'true') { window.location.href = 'login.html'; }
+    if (localStorage.getItem('rtec_user_type') !== 'funcionario') { 
+      alert('Acesso restrito para funcionários.'); 
+      window.location.href = 'login.html'; 
     }
+    
     const SUPABASE_URL = 'https://lcigujmubajgccnlyzfq.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_VA7m57PV0KTubn7sRyFv8g_Ttk_Ucc4';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -27,15 +30,20 @@
     html.font-xlarge { font-size: 22px; }
     html.daltonism-mode { filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="daltonism"><feColorMatrix type="matrix" values="0.35 0.7 -0.05 0 0 -0.15 1.15 0.05 0 0 0.1 0.1 0.8 0 0 0 0 0 1 0"/></filter></svg>#daltonism') contrast(120%); }
 
-    .accessibility-bar { position: fixed; bottom: 1rem; right: 1rem; display: flex; gap: 0.5rem; z-index: 9999; background: rgba(0,0,0,0.75); padding: 0.5rem 0.75rem; border-radius: 2rem; backdrop-filter: blur(6px); }
-    .acc-btn { background: #ffffff; border: none; border-radius: 50%; width: 2.25rem; height: 2.25rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: #0f172a; font-size: 0.875rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.2s; }
+    .accessibility-sidebar { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; z-index: 9999; align-items: flex-end; }
+    .accessibility-group { display: flex; flex-direction: row; gap: 0.5rem; background: rgba(0,0,0,0.6); padding: 0.5rem; border-radius: 2rem; backdrop-filter: blur(6px); align-items: center; }
+    .acc-btn { background: #ffffff; border: none; border-radius: 50%; width: 2.5rem; height: 2.5rem; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; color: #0f172a; font-size: 0.875rem; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: transform 0.2s; }
     .acc-btn:hover { transform: scale(1.08); }
+    
+    .chatbot-float-btn { background: #16a34a; width: 3.8rem; height: 3.8rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 0 4px #0f172a; border: none; transition: transform 0.2s, background 0.2s; }
+    .chatbot-float-btn:hover { transform: scale(1.05); background: #15803d; }
+    .chatbot-float-btn svg { width: 2.2rem; height: 2.2rem; fill: #ffffff; }
 
     body { width: 100%; min-height: 100vh; background-color: #f7f9f7; color: #0f172a; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
     body.dark-mode { background-color: #0f172a; color: #f8fafc; }
-    body.dark-mode header { background: #1e293b; box-shadow: 0 2px 10px rgba(0,0,0,0.3); border-bottom: 1px solid #334155; }
-    body.dark-mode .logo-area { background: #1e293b; }
+    body.dark-mode .app-container { background: #0f172a; color: #f8fafc; }
     body.dark-mode main { background: #0f172a; }
+    body.dark-mode .chatbot-float-btn { box-shadow: 0 4px 15px rgba(0,0,0,0.3), 0 0 0 4px #475569; }
     body.dark-mode .card { background: #1e293b; color: #f8fafc; border: 1px solid #334155; }
     body.dark-mode .card h3, body.dark-mode .stat-value { color: #f8fafc; }
     body.dark-mode .card p, body.dark-mode .muted { color: #94a3b8; }
@@ -44,23 +52,26 @@
     body.dark-mode thead { background: #1e293b; }
 
     .app-container { width: 100%; min-height: 100vh; background: #f7f9f7; display: flex; flex-direction: column; }
-    header { background: #15803d; width: 100%; min-height: 4.375rem; padding: 0.5rem 1rem; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 0; left: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); gap: 0.5rem; flex-wrap: nowrap; }
+    
+    /* HEADER PADRONIZADO */
+    .header-wrap { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
+    .header-wrap .mainbar { background: #15803d; display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: background 0.3s; min-height: 4.375rem; }
     .logo-area { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; background: #ffffff; border-radius: 1.5rem; padding: 0.25rem 0.5rem; flex-shrink: 0; }
     .logo-area img { height: 2.25rem; width: auto; display: block; object-fit: contain; }
-    .top-menu { display: flex; align-items: center; gap: 0.375rem; }
-    .menu-btn { background: rgba(255, 255, 255, 0.15); border: none; color: #ffffff; padding: 0.5rem 0.875rem; border-radius: 0.75rem; font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.375rem; text-decoration: none; transition: all 0.2s; white-space: nowrap; }
-    .menu-btn:hover, .menu-btn.active { background: #ffffff; color: #15803d; }
-    .menu-btn span.material-symbols-outlined { font-size: 1.125rem; }
-    .hamburger-btn { display: none; background: rgba(255, 255, 255, 0.2); border: none; color: #ffffff; width: 2.625rem; height: 2.625rem; border-radius: 0.75rem; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
-
+    .mainbar .nav-links { display: flex; gap: 1rem; align-items: center; }
+    .mainbar .nav-links a { color: #ffffff; opacity: 0.8; text-decoration: none; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; transition: all 0.2s; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
+    .mainbar .nav-links a:hover, .mainbar .nav-links a.active { opacity: 1; background: rgba(255,255,255,0.15); color: #ffffff; }
+    .hamburger { display: none; background: rgba(255,255,255,0.15); border: none; color: #ffffff; width: 2.5rem; height: 2.5rem; border-radius: 0.625rem; align-items: center; justify-content: center; cursor: pointer; }
+    
     @media (max-width: 900px) {
-      .top-menu { display: none; position: fixed; top: 4.375rem; left: 0; width: 100%; background: #14532d; flex-direction: column; padding: 1.25rem; gap: 0.5rem; box-shadow: 0 15px 30px rgba(0,0,0,0.25); border-bottom-left-radius: 1.5rem; border-bottom-right-radius: 1.5rem; z-index: 1001; }
-      .top-menu.open { display: flex; }
-      .hamburger-btn { display: flex; }
-      .badge-geo { display: none !important; }
-      .menu-btn { width: 100%; padding: 0.75rem 1rem; font-size: 0.9rem; justify-content: flex-start; background: rgba(255, 255, 255, 0.08); border-radius: 0.875rem; }
-      .menu-btn.active { background: #ffffff; color: #15803d; }
+      .header-wrap .mainbar .nav-links { display: none; position: fixed; top: 4.375rem; left: 0; width: 100%; background: #14532d; flex-direction: column; align-items: stretch; padding: 1rem; gap: 0.25rem; border-bottom: 3px solid #16a34a; box-shadow: 0 15px 30px rgba(0,0,0,0.25); }
+      .header-wrap .mainbar .nav-links.open { display: flex; }
+      .header-wrap .mainbar .nav-links a { padding: 0.875rem 1rem; border-radius: 0.625rem; }
+      .header-wrap .hamburger { display: flex; }
     }
+    body.dark-mode .header-wrap .mainbar { background: #1e293b; border-bottom: 1px solid #334155; }
+    body.dark-mode .header-wrap .mainbar .nav-links { background: #1e293b; }
+    body.dark-mode .header-wrap .mainbar .nav-links a { color: #e5e7eb; }
 
     main { flex: 1; width: 100%; padding: 6rem 1rem 3rem 1rem; display: flex; justify-content: center; align-items: flex-start; }
     .content-wrapper { width: 100%; max-width: 72rem; margin: 0 auto; }
@@ -68,7 +79,6 @@
     .card { background: #ffffff; border-radius: 1.25rem; padding: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
     .muted { color: #64748b; font-size: 0.85rem; }
 
-    /* Abas */
     .tab-bar { display: flex; gap: 0.5rem; background: #ffffff; border-radius: 1rem; padding: 0.375rem; box-shadow: 0 4px 15px rgba(0,0,0,0.08); flex-wrap: wrap; }
     body.dark-mode .tab-bar { background: #1e293b; }
     .tab-btn { flex: 1; min-width: 9rem; border: none; background: transparent; padding: 0.75rem 1rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; color: #64748b; display: flex; align-items: center; justify-content: center; gap: 0.375rem; transition: all 0.2s; }
@@ -77,7 +87,6 @@
     .btn-pdf { background: #dc2626; color: #fff; border: none; padding: 0.75rem 1.25rem; border-radius: 0.75rem; font-weight: 700; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; transition: background 0.2s; }
     .btn-pdf:hover { background: #b91c1c; }
 
-    /* Cards de estatísticas */
     .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
     @media (max-width: 1024px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 480px) { .stats-grid { grid-template-columns: 1fr 1fr; gap: 0.625rem; } }
@@ -89,7 +98,6 @@
     .stat-value { font-size: 1.5rem; font-weight: 800; }
     @media (max-width: 480px) { .stat-value { font-size: 1.25rem; } }
 
-    /* Tabela desktop / Lista mobile */
     .table-desktop { display: block; width: 100%; overflow-x: auto; }
     .table-desktop table { width: 100%; border-collapse: collapse; }
     .table-desktop th { text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; padding: 0.75rem 1rem; background: #f8fafc; }
@@ -112,7 +120,6 @@
     body.dark-mode .badge-yellow { background: #713f12; color: #fde047; }
     body.dark-mode .badge-blue { background: #1e3a8a; color: #93c5fd; }
 
-    /* Cards de protocolo */
     .proto-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
     @media (max-width: 767px) { .proto-grid { grid-template-columns: 1fr; } }
     .proto-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 1rem; padding: 1.125rem; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
@@ -136,20 +143,38 @@
     .month-detail { display: none; padding: 0.75rem 1rem; border-top: 1px solid #e2e8f0; font-size: 0.8rem; }
     body.dark-mode .month-detail { border-color: #334155; }
 
-    /* Modal */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.55); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; }
     .modal-overlay.open { display: flex; }
     .modal-box { background: #ffffff; border-radius: 1.25rem; max-width: 26rem; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.75rem; position: relative; }
     body.dark-mode .modal-box { background: #1e293b; color: #f8fafc; }
     .modal-close { position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; line-height: 1; }
 
-    /* Estrelas */
     .star { color: #facc15; }
     .star-empty { color: #cbd5e1; }
     body.dark-mode .star-empty { color: #475569; }
 
+    .chatbot-modal { position: fixed; bottom: 5rem; right: 6rem; width: 20rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 10000; overflow: hidden; border: 1px solid #e2e8f0; }
+    .chatbot-modal.active { display: flex; }
+    .chatbot-header { background: #16a34a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
+    .chatbot-header button { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; }
+    .chatbot-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; max-height: 20rem; overflow-y: auto; background: #f8fafc; }
+    .chatbot-message { background: #e2e8f0; padding: 0.75rem; border-radius: 0.75rem; font-size: 0.85rem; color: #1e293b; align-self: flex-start; max-width: 90%; }
+    .chatbot-footer { padding: 0.75rem; display: flex; gap: 0.5rem; background: #ffffff; border-top: 1px solid #e2e8f0; }
+    .chatbot-footer input { flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.85rem; outline: none; }
+    .chatbot-footer button { background: #16a34a; color: white; border: none; border-radius: 0.5rem; padding: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    body.dark-mode .chatbot-modal { background: #1e293b; border-color: #334155; }
+    body.dark-mode .chatbot-body { background: #0f172a; }
+    body.dark-mode .chatbot-message { background: #334155; color: #f8fafc; }
+    body.dark-mode .chatbot-footer { background: #1e293b; border-top-color: #334155; }
+    body.dark-mode .chatbot-footer input { background: #0f172a; border-color: #334155; color: #f8fafc; }
+
+    @media (max-width: 500px) {
+      .chatbot-modal { width: calc(100vw - 2rem); right: 1rem; bottom: 6rem; }
+      .accessibility-sidebar { bottom: 1rem; right: 1rem; }
+    }
+
     @media print {
-      header, .accessibility-bar, .tab-bar, .btn-pdf, .btn, .search-input, .hamburger-btn { display: none !important; }
+      header, .accessibility-sidebar, .tab-bar, .btn-pdf, .btn, .search-input, .hamburger { display: none !important; }
       main { padding: 0; }
       body { background: #fff; }
       .card { box-shadow: none; border: 1px solid #ddd; }
@@ -158,32 +183,31 @@
 </head>
 <body>
   <div class="app-container">
-    <header>
-      <a href="sobre.html" class="logo-area">
-        <img src="img/logo.png" alt="RTEC Logo">
-      </a>
-      <nav class="top-menu" id="topMenu">
-        <a href="funcionarios.html" class="menu-btn active"><span class="material-symbols-outlined">dashboard</span><span>Painel</span></a>
-        <a href="funcionarios.html?filtro=hoje" class="menu-btn"><span class="material-symbols-outlined">calendar_today</span><span>Agendamentos do Dia</span></a>
-        <a href="triagem.html" class="menu-btn"><span class="material-symbols-outlined">recycling</span><span>Triagem</span></a>
-        <a href="operacional.html" class="menu-btn"><span class="material-symbols-outlined">local_shipping</span><span>Operacional</span></a>
-        <a href="feedback.html" class="menu-btn"><span class="material-symbols-outlined">rate_review</span><span>Feedback</span></a>
-        <a href="sobre.html" class="menu-btn" onclick="fazerLogout(); return false;"><span class="material-symbols-outlined">logout</span><span>Sair</span></a>
-      </nav>
-      <div style="display: flex; align-items: center; gap: 0.5rem;">
-        <div class="badge-geo" style="background: rgba(255,255,255,0.2); color: white; padding: 0.375rem 0.75rem; border-radius: 1.25rem; font-size: 0.72rem; font-weight: 700; display: flex; align-items: center; gap: 0.375rem; white-space: nowrap;">
-          <span style="width: 0.4375rem; height: 0.4375rem; background: #4ade80; border-radius: 50%; display: inline-block; flex-shrink: 0;"></span> Franco da Rocha
+    <div class="header-wrap">
+      <div class="mainbar">
+        <a href="index.html" class="logo-area">
+          <img src="img/logo.png" alt="RTEC Logo">
+        </a>
+        <nav class="nav-links" id="navLinks">
+          <a href="funcionarios.html" class="active">Painel</a>
+          <a href="monitoria.html">Monitor</a>
+          <a href="operacional.html">Operacional</a>
+          <a href="feedback.html">Feedbacks</a>
+          <a href="configuracoes.html">Configurações</a>
+          <a href="#" onclick="fazerLogout(); return false;">Sair</a>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <button class="hamburger" aria-label="Abrir menu" onclick="document.getElementById('navLinks').classList.toggle('open')">
+            <span class="material-symbols-outlined">menu</span>
+          </button>
         </div>
-        <button class="menu-btn" onclick="toggleDarkMode()" title="Modo Claro/Escuro" style="padding: 0.5rem 0.75rem; background: rgba(255,255,255,0.2);"><span class="material-symbols-outlined" id="dark-icon" style="font-size:1.125rem;">dark_mode</span></button>
-        <button class="hamburger-btn" onclick="toggleMenu()"><span class="material-symbols-outlined">menu</span></button>
       </div>
-    </header>
+    </div>
 
     <main>
       <div class="content-wrapper">
 
         <div style="text-align: center; margin-bottom: 1.5rem;">
-          <span style="font-size: 0.72rem; font-weight: 700; color: #16a34a; text-transform: uppercase;">Portal Interno</span>
           <h2 style="font-size: 1.625rem; font-weight: 800; margin-top: 0.25rem;">Painel de Gerenciamento - RTEC</h2>
           <p class="muted" style="margin-top: 0.375rem;">Acompanhe as doações recebidas e o aproveitamento dos materiais para fins educacionais</p>
         </div>
@@ -233,7 +257,7 @@
             </div>
             <div class="table-desktop">
               <table>
-                <thead><tr><th>Data</th><th>Tipo</th><th>Resíduo</th><th>Status</th></tr></thead>
+                <thead><tr><th>Data</th><th>E-mail</th><th>Resíduo</th><th>Status</th></tr></thead>
                 <tbody id="tbodyRecentes"></tbody>
               </table>
             </div>
@@ -253,11 +277,11 @@
             <div class="proto-grid" id="listaProtocolos"></div>
           </div>
 
-          <!-- Feedbacks -->
+          <!-- Feedbacks Resumo -->
           <div class="card" style="padding: 0; overflow: hidden;">
             <div style="padding: 1.125rem 1.25rem; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
               <h3 style="font-size: 1rem; font-weight: 800;"><i class="fas fa-comment-dots" style="color:#16a34a;"></i> Feedbacks dos Usuários</h3>
-              <span class="muted">Avaliações recentes</span>
+              <a href="feedback.html" class="btn btn-blue" style="text-decoration:none;">Ver Todos</a>
             </div>
             <div id="listaFeedbacks" style="padding: 0 1.25rem;"></div>
           </div>
@@ -317,7 +341,7 @@
           <div id="protocoloNumero" style="font-size:1.375rem; font-weight:800; color:#16a34a; font-family:monospace;"></div>
         </div>
         <div style="text-align:left; background:#f8fafc; border-radius:0.75rem; padding:1rem; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem;">
-          <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">Tipo:</span><strong id="protocoloTipo"></strong></div>
+          <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">E-mail:</span><strong id="protocoloEmail" style="word-break:break-all;"></strong></div>
           <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">Resíduo:</span><strong id="protocoloResiduo"></strong></div>
           <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">Data:</span><strong id="protocoloData"></strong></div>
           <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">Horário:</span><strong id="protocoloHora"></strong></div>
@@ -328,17 +352,37 @@
     </div>
   </div>
 
-  <div class="accessibility-bar">
-    <button class="acc-btn" onclick="mudarFonte()" title="Aumentar / Reduzir Fonte">A+</button>
-    <button class="acc-btn" onclick="toggleDaltonismoAPI()" title="API Filtro Daltonismo"><span class="material-symbols-outlined" style="font-size:1.125rem;">visibility</span></button>
+  <div class="chatbot-modal" id="chatbot-modal">
+    <div class="chatbot-header">
+      <span>Assistente Virtual</span>
+      <button onclick="toggleChat()">&times;</button>
+    </div>
+    <div class="chatbot-body">
+      <div class="chatbot-message">Olá! Sou seu assistente virtual. Como posso ajudar?</div>
+    </div>
+    <div class="chatbot-footer">
+      <input type="text" placeholder="Digite sua mensagem..." />
+      <button><span class="material-symbols-outlined">send</span></button>
+    </div>
+  </div>
+
+  <div class="accessibility-sidebar">
+    <div class="accessibility-group">
+      <button class="acc-btn" onclick="mudarFonte()" title="Aumentar / Reduzir Fonte">A+</button>
+      <button class="acc-btn" onclick="toggleDaltonismoAPI()" title="API Filtro Daltonismo"><span class="material-symbols-outlined" style="font-size:1.125rem;">visibility</span></button>
+      <div vw class="enabled" title="VLibras - Libras"></div>
+    </div>
+    <button class="chatbot-float-btn" onclick="toggleChat()" title="Abrir Assistente Virtual">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M16.5 10.5C16.5 11.3284 15.8284 12 15 12C14.1716 12 13.5 11.3284 13.5 10.5C13.5 9.67157 14.1716 9 15 9C15.8284 9 16.5 9.67157 16.5 10.5ZM10.5 12C11.3284 12 12 11.3284 12 10.5C12 9.67157 11.3284 9 10.5 9C9.67157 9 9 9.67157 9 10.5C9 11.3284 9.67157 12 10.5 12Z"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM4 12C4 7.58172 7.58172 4 12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C10.5191 20 9.12767 19.5968 7.9224 18.8954L4.31995 19.6801L5.10456 16.0776C4.40316 14.8723 4 13.4809 4 12Z"/>
+        <path d="M20.5 10C20.5 10.8284 19.8284 11.5 19 11.5C18.1716 11.5 17.5 10.8284 17.5 10C17.5 9.17157 18.1716 8.5 19 8.5C19.8284 8.5 20.5 9.17157 20.5 10ZM19 15C19.8284 15 20.5 14.3284 20.5 13.5C20.5 12.6716 19.8284 12 19 12C18.1716 12 17.5 12.6716 17.5 13.5C17.5 14.3284 18.1716 15 19 15Z"/>
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.8214 2.48697 15.5291 3.33782 17L2.5 21.5L7 20.6622C8.47087 21.513 10.1786 22 12 22C17.5228 22 22 17.5228 22 12ZM12 4C16.4183 4 20 7.58172 20 12C20 16.4183 16.4183 20 12 20C10.5191 20 9.12767 19.5968 7.9224 18.8954L4.31995 19.6801L5.10456 16.0776C4.40316 14.8723 4 13.4809 4 12C4 7.58172 7.58172 4 12 4Z"/>
+      </svg>
+    </button>
   </div>
 
   <script>
-    /* ================================================================
-       DADOS — ajuste os nomes de tabelas/colunas conforme seu schema
-       Supabase. Se a consulta falhar, o painel usa dados de exemplo
-       (modo demo) para não ficar em branco.
-       ================================================================ */
     let DEMO_MODE = false;
     let agendamentos = [];
     let materiais = [];
@@ -347,16 +391,14 @@
     const ENDERECO_COLETA = 'Ecoponto - Franco da Rocha/SP';
 
     const demoAgendamentos = [
-      { id: 1, protocolo_agendamento: 'RTEC-2026-001', tipo_pessoa: 'fisica', nome_residuo: 'Monitor CRT', status: 'Concluido', data_agendamento: '2026-10-20', hora_agendamento: '09:00' },
-      { id: 2, protocolo_agendamento: 'RTEC-2026-002', tipo_pessoa: 'juridica', nome_residuo: 'Notebook', status: 'Agendado', data_agendamento: '2026-10-22', hora_agendamento: '14:00' },
-      { id: 3, protocolo_agendamento: 'RTEC-2026-003', tipo_pessoa: 'fisica', nome_residuo: 'Cabo de rede', status: 'Pendente', data_agendamento: '2026-10-23', hora_agendamento: '10:30' },
-      { id: 4, protocolo_agendamento: 'RTEC-2026-004', tipo_pessoa: 'fisica', nome_residuo: 'Fonte ATX', status: 'Concluido', data_agendamento: '2026-10-15', hora_agendamento: '08:00' },
+      { id: 1, protocolo_agendamento: 'RTEC-2026-001', email_usuario_agendamento: 'joao@email.com', nome_residuo: 'Monitor CRT', status: 'Concluido', data_agendamento: '2026-10-20', hora_agendamento: '09:00' },
+      { id: 2, protocolo_agendamento: 'RTEC-2026-002', email_usuario_agendamento: 'empresa@email.com', nome_residuo: 'Notebook', status: 'Agendado', data_agendamento: '2026-10-22', hora_agendamento: '14:00' },
+      { id: 3, protocolo_agendamento: 'RTEC-2026-003', email_usuario_agendamento: 'maria@email.com', nome_residuo: 'Cabo de rede', status: 'Pendente', data_agendamento: '2026-10-23', hora_agendamento: '10:30' },
     ];
     const demoMateriais = [
       { id: 1, nome_material: 'Monitor LCD', destino: 'aula', status_processamento: 'Processado', monitor_nome: 'Ana Souza', data_cadastro: '2026-10-18' },
       { id: 2, nome_material: 'Notebook', destino: 'aula', status_processamento: 'Em Espera', monitor_nome: 'Carlos Lima', data_cadastro: '2026-10-20' },
       { id: 3, nome_material: 'Teclado', destino: 'coleta', status_processamento: 'Em Processo', monitor_nome: 'Ana Souza', data_cadastro: '2026-10-21' },
-      { id: 4, nome_material: 'Mouse', destino: 'pendente', status_processamento: 'Em Espera', monitor_nome: 'Bruno Reis', data_cadastro: '2026-10-21' },
     ];
     const demoFeedbacks = [
       { id: 1, avaliacao_estrelas: 5, recomendaria: 'sim', data_envio: '2026-10-20' },
@@ -372,14 +414,19 @@
     async function carregarDados() {
       try {
         const [rAgen, rMat, rFeed] = await Promise.all([
-          _supabase.from('agendamentos').select('*').order('data_agendamento', { ascending: false }),
-          _supabase.from('materiais_monitoria').select('*').order('data_cadastro', { ascending: false }),
-          _supabase.from('feedbacks').select('*').order('data_envio', { ascending: false }).limit(10),
+          _supabase.from('tbl_agendamento').select('*').order('data_agendada', { ascending: false }),
+          _supabase.from('tbl_material_cadastrado').select('*, tbl_tipomaterial(nome_material), tbl_usuario(nome_usuario)').order('data_cadastro', { ascending: false }),
+          _supabase.from('tbl_feedback').select('*').order('data_envio', { ascending: false }).limit(5),
         ]);
-        if (rAgen.error || rMat.error || rFeed.error) throw new Error('schema');
-        agendamentos = rAgen.data || [];
-        materiais = rMat.data || [];
+        
+        if (rAgen.error) console.warn("Aviso Agendamentos:", rAgen.error);
+        if (rMat.error) console.warn("Aviso Materiais:", rMat.error);
+        if (rFeed.error) console.warn("Aviso Feedbacks:", rFeed.error);
+
+        agendamentos = (rAgen.data || []).map(a => ({ ...a, nome_residuo: a.nome_residuo || 'Eletrônico', data_agendamento: a.data_agendada, hora_agendamento: a.hora_agendada }));
+        materiais = (rMat.data || []).map(m => ({ ...m, nome_material: m.tbl_tipomaterial?.nome_material || 'Material', monitor_nome: m.tbl_usuario?.nome_usuario || 'Monitor' }));
         feedbacks = rFeed.data || [];
+        
         if (!agendamentos.length && !materiais.length) throw new Error('vazio');
       } catch (e) {
         DEMO_MODE = true;
@@ -391,7 +438,6 @@
       renderTudo();
     }
 
-    /* ===================== RENDERIZAÇÃO ===================== */
     function badgeStatus(status) {
       const map = {
         'Concluido': 'badge-green', 'Concluído': 'badge-green', 'Processado': 'badge-green', 'Finalizado': 'badge-green',
@@ -402,7 +448,6 @@
     }
 
     function renderTudo() {
-      // Estatísticas
       const hoje = new Date().toISOString().slice(0, 10);
       const mesAtual = hoje.slice(0, 7);
       document.getElementById('statTotal').textContent = agendamentos.length;
@@ -410,20 +455,19 @@
       document.getElementById('statMes').textContent = agendamentos.filter(a => (a.data_agendamento || '').startsWith(mesAtual)).length;
       document.getElementById('statColetados').textContent = agendamentos.filter(a => a.status === 'Concluido').length;
 
-      // Agendamentos recentes (últimos 5) — desktop e mobile
       const recentes = agendamentos.slice(0, 5);
       document.getElementById('tbodyRecentes').innerHTML = recentes.length
         ? recentes.map(a => `<tr onclick='abrirModalProtocolo(${JSON.stringify(a).replace(/'/g, "&#39;")})'>
             <td>${formatData(a.data_agendamento)}</td>
-            <td>${(a.tipo_pessoa || 'N/D').charAt(0).toUpperCase() + (a.tipo_pessoa || '').slice(1)}</td>
+            <td>${a.email_usuario_agendamento || 'N/D'}</td>
             <td>${a.nome_residuo || 'N/D'}</td>
             <td>${badgeStatus(a.status)}</td></tr>`).join('')
-        : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhuma doação recente encontrada.</td></tr>';
+        : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhuma doação recente.</td></tr>';
 
       document.getElementById('listaRecentesMobile').innerHTML = recentes.length
         ? recentes.map(a => `<div class="row-mobile" onclick='abrirModalProtocolo(${JSON.stringify(a).replace(/'/g, "&#39;")})'>
             <div><strong style="font-size:0.85rem;">${a.nome_residuo || 'N/D'}</strong><br>
-            <span class="muted">${formatData(a.data_agendamento)} · ${(a.tipo_pessoa || '').charAt(0).toUpperCase() + (a.tipo_pessoa || '').slice(1)}</span></div>
+            <span class="muted">${formatData(a.data_agendamento)} · ${a.email_usuario_agendamento || 'N/D'}</span></div>
             ${badgeStatus(a.status)}</div>`).join('')
         : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhuma doação recente.</p>';
 
@@ -479,7 +523,7 @@
               ${badgeStatus(a.status)}
             </div>
             <div style="font-size:0.82rem; display:flex; flex-direction:column; gap:0.375rem; color:inherit;">
-              <p><strong>Tipo:</strong> ${(a.tipo_pessoa || 'N/D').charAt(0).toUpperCase() + (a.tipo_pessoa || '').slice(1)}</p>
+              <p><strong>E-mail:</strong> ${a.email_usuario_agendamento || 'N/D'}</p>
               <p><strong>Resíduo:</strong> ${a.nome_residuo || 'N/D'}</p>
               <p><strong>Data:</strong> ${formatData(a.data_agendamento)} às ${a.hora_agendamento || '--:--'}</p>
             </div>
@@ -488,7 +532,7 @@
               ${a.status !== 'Concluido' ? `<button class="btn btn-green" onclick="concluirAgendamento(${a.id})"><i class="fas fa-check"></i> Concluir</button>` : ''}
             </div>
           </div>`).join('')
-        : '<p class="muted" style="grid-column:1/-1; text-align:center; padding:1.5rem 0;">Nenhum registro encontrado para este filtro.</p>';
+        : '<p class="muted" style="grid-column:1/-1; text-align:center; padding:1.5rem 0;">Nenhum registro encontrado.</p>';
 
       if (!silencioso && f !== 'geral') {
         showReport('donations');
@@ -497,15 +541,12 @@
     }
 
     async function concluirAgendamento(id) {
-      if (!confirm('Tem certeza que deseja marcar este agendamento como CONCLUÍDO? Esta ação não pode ser desfeita.')) return;
+      if (!confirm('Marcar este agendamento como CONCLUÍDO?')) return;
       if (!DEMO_MODE) {
         try {
-          const { error } = await _supabase.from('agendamentos').update({ status: 'Concluido' }).eq('id', id);
+          const { error } = await _supabase.from('tbl_agendamento').update({ status: 'Concluido' }).eq('id_agendamento', id);
           if (error) throw error;
-        } catch (e) {
-          alert('Erro ao concluir: ' + e.message);
-          return;
-        }
+        } catch (e) { alert('Erro: ' + e.message); return; }
       }
       const item = agendamentos.find(a => a.id === id);
       if (item) item.status = 'Concluido';
@@ -525,11 +566,10 @@
 
     function renderEducacional() {
       document.getElementById('statMatTotal').textContent = materiais.length;
-      document.getElementById('statMatAula').textContent = materiais.filter(m => m.destino === 'aula').length;
-      document.getElementById('statMatPendente').textContent = materiais.filter(m => m.destino === 'pendente' || m.status_processamento === 'Em Espera').length;
-      document.getElementById('statMatColeta').textContent = materiais.filter(m => m.destino === 'coleta').length;
+      document.getElementById('statMatAula').textContent = materiais.filter(m => m.destino === 'aula' || m.id_tipo_destino === 2).length;
+      document.getElementById('statMatPendente').textContent = materiais.filter(m => m.status_processamento === 'Em Espera').length;
+      document.getElementById('statMatColeta').textContent = materiais.filter(m => m.destino === 'coleta' || m.id_tipo_destino === 1).length;
 
-      // Top 5 tipos
       const contagem = {};
       materiais.forEach(m => { const k = m.nome_material || 'Outros'; contagem[k] = (contagem[k] || 0) + 1; });
       const top = Object.entries(contagem).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -542,7 +582,6 @@
           }).join('')
         : '<p class="muted" style="text-align:center;">Nenhum material cadastrado.</p>';
 
-      // Tendência mensal
       const porMes = {};
       materiais.forEach(m => {
         const mes = (m.data_cadastro || '').slice(0, 7);
@@ -568,22 +607,20 @@
               <div class="month-detail"><strong>Itens no mês:</strong> ${total}</div>
             </div>`;
           }).join('')
-        : '<p class="muted" style="text-align:center;">Nenhum histórico mensal de materiais.</p>';
+        : '<p class="muted" style="text-align:center;">Nenhum histórico mensal.</p>';
 
-      // Recentes para aula
-      const paraAula = materiais.filter(m => m.destino === 'aula').slice(0, 5);
+      const paraAula = materiais.filter(m => m.destino === 'aula' || m.id_tipo_destino === 2).slice(0, 5);
       document.getElementById('tbodyMateriais').innerHTML = paraAula.length
         ? paraAula.map(m => `<tr><td>${formatData(m.data_cadastro)}</td><td>${m.nome_material || 'N/D'}</td><td>${m.monitor_nome || 'N/D'}</td><td>${badgeStatus(m.status_processamento)}</td></tr>`).join('')
-        : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhum material destinado para aula encontrado.</td></tr>';
+        : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhum material para aula.</td></tr>';
       document.getElementById('listaMateriaisMobile').innerHTML = paraAula.length
         ? paraAula.map(m => `<div class="row-mobile">
             <div><strong style="font-size:0.85rem;">${m.nome_material || 'N/D'}</strong><br>
             <span class="muted">${formatData(m.data_cadastro)} · ${m.monitor_nome || 'N/D'}</span></div>
             ${badgeStatus(m.status_processamento)}</div>`).join('')
-        : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhum material destinado para aula.</p>';
+        : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhum material para aula.</p>';
     }
 
-    /* ===================== UI ===================== */
     function showReport(tipo) {
       document.getElementById('donationsReport').style.display = tipo === 'donations' ? 'block' : 'none';
       document.getElementById('educationalReport').style.display = tipo === 'educational' ? 'block' : 'none';
@@ -593,7 +630,7 @@
 
     function abrirModalProtocolo(a) {
       document.getElementById('protocoloNumero').textContent = '#' + (a.protocolo_agendamento || 'N/D');
-      document.getElementById('protocoloTipo').textContent = a.tipo_pessoa ? a.tipo_pessoa.charAt(0).toUpperCase() + a.tipo_pessoa.slice(1) : 'N/D';
+      document.getElementById('protocoloEmail').textContent = a.email_usuario_agendamento || 'N/D';
       document.getElementById('protocoloResiduo').textContent = a.nome_residuo || 'N/D';
       document.getElementById('protocoloData').textContent = formatData(a.data_agendamento);
       document.getElementById('protocoloHora').textContent = a.hora_agendamento || 'N/D';
@@ -609,7 +646,6 @@
 
     document.getElementById('buscarProtocolo').addEventListener('input', () => aplicarFiltro(filtroAtual, true));
 
-    /* Configurações globais (originais do funcionarios.html) */
     function aplicarConfiguracoesGlobais() {
       if (localStorage.getItem('rtec_dark') === 'true') {
         document.body.classList.add('dark-mode');
@@ -621,6 +657,7 @@
       if (fonte === 'large') document.documentElement.classList.add('font-large');
       if (fonte === 'xlarge') document.documentElement.classList.add('font-xlarge');
     }
+    
     window.addEventListener('DOMContentLoaded', () => {
       aplicarConfiguracoesGlobais();
       carregarDados();
@@ -629,26 +666,16 @@
     function fazerLogout() {
       localStorage.removeItem('rtec_logged');
       localStorage.removeItem('rtec_user_type');
-      window.location.href = 'sobre.html';
+      window.location.href = 'login.html';
     }
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      const isDark = document.body.classList.contains('dark-mode');
-      localStorage.setItem('rtec_dark', isDark);
-      document.getElementById('dark-icon').textContent = isDark ? 'light_mode' : 'dark_mode';
-    }
+    
+    function toggleChat() { document.getElementById('chatbot-modal').classList.toggle('active'); }
+    
     async function toggleDaltonismoAPI() {
-      const htmlEl = document.documentElement;
-      htmlEl.classList.toggle('daltonism-mode');
-      const ativo = htmlEl.classList.contains('daltonism-mode');
-      localStorage.setItem('rtec_daltonism', ativo);
-      try {
-        await fetch('https://httpbin.org/post', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ accessibilityProfile: 'daltonism', status: ativo, timestamp: Date.now() })
-        });
-      } catch (e) { console.log('API de Daltonismo sincronizada localmente.'); }
+      document.documentElement.classList.toggle('daltonism-mode');
+      localStorage.setItem('rtec_daltonism', document.documentElement.classList.contains('daltonism-mode'));
     }
+    
     function mudarFonte() {
       const htmlEl = document.documentElement;
       if (!htmlEl.classList.contains('font-large') && !htmlEl.classList.contains('font-xlarge')) {
@@ -660,7 +687,8 @@
         htmlEl.classList.remove('font-xlarge'); localStorage.setItem('rtec_font', 'normal');
       }
     }
-    function toggleMenu() { document.getElementById('topMenu').classList.toggle('open'); }
   </script>
+  <script src="https://vlibras.gov.br/app/vlibras-plugin.js"></script>
+  <script>new window.VLibras.Widget('https://vlibras.gov.br/app');</script>
 </body>
 </html>
