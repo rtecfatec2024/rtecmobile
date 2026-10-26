@@ -444,7 +444,7 @@
       document.getElementById('btn-cadastrar').disabled = !check;
     }
 
-    // LÓGICA DE CADASTRO
+  // LÓGICA DE CADASTRO CORRIGIDA
     async function realizarCadastro(event) {
       event.preventDefault();
       
@@ -469,6 +469,7 @@
       btnSubmit.disabled = true;
 
       try {
+        // 1. Cria a conta no sistema de Autenticação do Supabase
         const { data: authData, error: authError } = await _supabase.auth.signUp({
           email: email,
           password: senha,
@@ -480,11 +481,12 @@
         if (authError) throw authError;
 
         if (authData.user) {
+          // 2. Insere os dados na tabela personalizada tbl_usuario
           const { error: dbError } = await _supabase.from('tbl_usuario').insert([{
             nome_usuario: nome,
             sobrenome_usuario: sobrenome,
             email_usuario: email,
-            senha_usuario: 'GERENCIADO_PELO_AUTH', 
+            senha_usuario: senha, // Passando a senha (ou hash) para respeitar o NOT NULL do banco
             tipo_usuario: perfil
           }]);
 
@@ -503,7 +505,7 @@
         }
       } catch (err) {
         console.error(err);
-        if (err.message.includes('User already registered')) {
+        if (err.message && err.message.includes('User already registered')) {
           alert('Este e-mail já está cadastrado. Tente fazer login.');
         } else {
           alert('Erro ao criar conta: ' + err.message);
