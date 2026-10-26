@@ -16,8 +16,8 @@
     // Acesso só para funcionário e monitor (o servidor/RLS do Supabase é quem protege os dados de verdade)
     const ACESSO_OK = localStorage.getItem('rtec_logged') === 'true' && ['funcionario', 'monitor'].includes(localStorage.getItem('rtec_user_type'));
     if (!ACESSO_OK) { window.location.replace('login.html'); }
-    const SUPABASE_URL = 'https://lcigujmubajgccnlyzfq.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_VA7m57PV0KTubn7sRyFv8g_Ttk_Ucc4';
+   const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co/rest/v1/';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Yja3XcdOkwAOY2RHK6wS2A_LyazoP1c';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
