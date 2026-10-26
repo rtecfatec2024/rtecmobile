@@ -12,20 +12,19 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co';
+     const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Yja3XcdOkwAOY2RHK6wS2A_LyazoP1c';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
 
   <style>
-    /* ... (Mantenha o CSS idêntico ao da página de feedback que enviei anteriormente, não alterei o estilo) ... */
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     html { font-size: 16px; transition: font-size 0.2s ease; }
     html.font-large { font-size: 19px; }
     html.font-xlarge { font-size: 22px; }
-    html.daltonism-mode { filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="daltonism"><feColorMatrix type="matrix" values="0.35 0.7 -0.05 0 0 -0.15 1.15 0.05 0 0.1 0.1 0.8 0 0 0 0 0 1 0"/></filter></svg>#daltonism') contrast(120%); }
+    html.daltonism-mode { filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="daltonism"><feColorMatrix type="matrix" values="0.35 0.7 -0.05 0 0 -0.15 1.15 0.05 0 0 0.1 0.1 0.8 0 0 0 0 0 1 0"/></filter></svg>#daltonism') contrast(120%); }
 
-    /* BARRA DE ACESSIBILIDADE (VERTICAL, LATERAL DIREITA, JUNTO DO VLIBRAS) */
+    /* BARRA DE ACESSIBILIDADE */
     .accessibility-sidebar { position: fixed; top: 50%; right: 0.75rem; z-index: 9999; }
     .accessibility-buttons { position: fixed; top: calc(50% + 1.8rem); right: 0.60rem; display: flex; flex-direction: column; gap: 0.5rem; z-index: 9999; }
     .accessibility-group { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
@@ -127,7 +126,6 @@
     body.dark-mode .header-wrap .mainbar .nav-links { background: #1e293b; }
     body.dark-mode .header-wrap .mainbar .nav-links a:hover { background: #334155; }
 
-    /* VLibras: força o mesmo tamanho, cor e alinhamento dos outros botões */
     .accessibility-group { width: 2.5rem; align-items: stretch; }
     .accessibility-group [vw],
     .accessibility-group [vw].enabled { position: static !important; display: block !important; width: 2.5rem !important; height: 2.5rem !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; inset: auto !important; transform: none !important; }
@@ -136,21 +134,28 @@
     .accessibility-group div[vw-access-button] * { display: none !important; }
     .accessibility-group div[vw-access-button]::before { content: ""; width: 1.75rem; height: 1.75rem; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2a2 2 0 0 1 2 2v6.5l1-.5a1.5 1.5 0 0 1 2.5 1.3v2.2a1.5 1.5 0 0 1-2.5 1.3l-1-.5v1.5a4 4 0 0 1-8 0V9.2a1.5 1.5 0 0 1 2.5-1.3l1 .5V4a2 2 0 0 1 2-2zM6 7a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V8a1 1 0 0 0-1-1zm10 2a1 1 0 0 0-1 1v2a1 1 0 0 0 2 0v-2a1 1 0 0 0-1-1z"/><path d="M12 3a1 1 0 0 0-1 1v9l-2-1V8a1 1 0 0 0-2 0v6.5a3 3 0 0 0 6 0V4a1 1 0 0 0-1-1z"/></svg>') center/contain no-repeat; }
 
-    /* Os 2 botões de acessibilidade com exatamente o mesmo tamanho */
     .accessibility-buttons .acc-btn { width: 2.5rem; height: 2.5rem; padding: 0; background: #1351b4; }
 
-    .chatbot-modal { position: fixed; bottom: 6rem; right: 1.5rem; width: 20rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 10000; overflow: hidden; border: 1px solid #e2e8f0; }
+    /* ESTILOS DO CHATBOT APRIMORADO */
+    .chatbot-modal { position: fixed; bottom: 6rem; right: 1.5rem; width: 21rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 10000; overflow: hidden; border: 1px solid #e2e8f0; }
     .chatbot-modal.active { display: flex; }
     .chatbot-header { background: #16a34a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
     .chatbot-header button { background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem; }
-    .chatbot-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; max-height: 20rem; overflow-y: auto; background: #f8fafc; }
-    .chatbot-message { background: #e2e8f0; padding: 0.75rem; border-radius: 0.75rem; font-size: 0.85rem; color: #1e293b; align-self: flex-start; max-width: 90%; }
+    .chatbot-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; max-height: 18rem; overflow-y: auto; background: #f8fafc; }
+    .chatbot-message { padding: 0.75rem; border-radius: 0.75rem; font-size: 0.85rem; line-height: 1.45; word-break: break-word; }
+    .chatbot-message.bot { background: #e2e8f0; color: #1e293b; align-self: flex-start; max-width: 90%; border-bottom-left-radius: 2px; }
+    .chatbot-message.user { background: #16a34a; color: #ffffff; align-self: flex-end; max-width: 90%; border-bottom-right-radius: 2px; }
+    .chatbot-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; padding: 0.5rem 0.75rem; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+    .chat-chip { background: #ffffff; border: 1px solid #16a34a; color: #16a34a; border-radius: 999px; padding: 0.25rem 0.6rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .chat-chip:hover { background: #16a34a; color: #ffffff; }
     .chatbot-footer { padding: 0.75rem; display: flex; gap: 0.5rem; background: #ffffff; border-top: 1px solid #e2e8f0; }
     .chatbot-footer input { flex: 1; padding: 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.5rem; font-size: 0.85rem; outline: none; }
     .chatbot-footer button { background: #16a34a; color: white; border: none; border-radius: 0.5rem; padding: 0.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     body.dark-mode .chatbot-modal { background: #1e293b; border-color: #334155; }
-    body.dark-mode .chatbot-body { background: #0f172a; }
-    body.dark-mode .chatbot-message { background: #334155; color: #f8fafc; }
+    body.dark-mode .chatbot-body, body.dark-mode .chatbot-chips { background: #0f172a; border-color: #334155; }
+    body.dark-mode .chatbot-message.bot { background: #334155; color: #f8fafc; }
+    body.dark-mode .chat-chip { background: #0f172a; border-color: #4ade80; color: #4ade80; }
+    body.dark-mode .chat-chip:hover { background: #4ade80; color: #0f172a; }
     body.dark-mode .chatbot-footer { background: #1e293b; border-top-color: #334155; }
     body.dark-mode .chatbot-footer input { background: #0f172a; border-color: #334155; color: #f8fafc; }
 
@@ -267,18 +272,25 @@
     </main>
   </div>
 
+  <!-- CHATBOT MODAL APRIMORADO -->
   <div class="chatbot-modal" id="chatbot-modal">
     <div class="chatbot-header">
-      <span>Assistente Virtual</span>
-      <button onclick="toggleChat()">&times;</button>
+      <span>Assistente Virtual RTEC</span>
+      <button type="button" onclick="toggleChat()">&times;</button>
     </div>
-    <div class="chatbot-body">
-      <div class="chatbot-message">Olá! Sou seu assistente virtual. Como posso ajudar?</div>
+    <div class="chatbot-body" id="chatbot-body">
+      <div class="chatbot-message bot">Olá! Sou seu assistente virtual do RTEC. Tem alguma dúvida antes ou depois de avaliar nossa plataforma?</div>
     </div>
-    <div class="chatbot-footer">
-      <input type="text" placeholder="Digite sua mensagem..." />
-      <button><span class="material-symbols-outlined">send</span></button>
+    <div class="chatbot-chips" id="chatbot-chips">
+      <button type="button" class="chat-chip" onclick="enviarMensagemChat('Horário de atendimento')">Horários</button>
+      <button type="button" class="chat-chip" onclick="enviarMensagemChat('Endereço do local')">Endereço</button>
+      <button type="button" class="chat-chip" onclick="enviarMensagemChat('Como agendar coleta?')">Como agendar?</button>
+      <button type="button" class="chat-chip" onclick="enviarMensagemChat('Quais resíduos são aceitos?')">Resíduos aceitos</button>
     </div>
+    <form class="chatbot-footer" onsubmit="processarEnvioChat(event)">
+      <input type="text" id="chatbot-input" placeholder="Digite sua mensagem..." autocomplete="off" />
+      <button type="submit" aria-label="Enviar mensagem"><span class="material-symbols-outlined">send</span></button>
+    </form>
   </div>
 
   <footer class="rtec-footer">
@@ -295,27 +307,102 @@
     <p class="footer-tagline">Contribuindo para um futuro mais sustentável</p>
   </footer>
 
-  <!-- VLIBRAS (caixa própria, no meio da lateral direita) -->
   <div class="accessibility-sidebar">
     <div class="accessibility-group">
       <div vw class="enabled" title="VLibras - Libras"></div>
     </div>
   </div>
 
-  <!-- BOTÕES DE ACESSIBILIDADE (caixa própria, logo abaixo do VLibras) -->
   <div class="accessibility-buttons">
     <button class="acc-btn" onclick="mudarFonte()" title="Aumentar / Reduzir Fonte">A+</button>
     <button class="acc-btn" onclick="toggleDaltonismoAPI()" title="Filtro para Daltonismo"><span class="material-symbols-outlined" style="font-size:1.125rem;">visibility</span></button>
   </div>
 
-  <!-- BOTÃO DO CHATBOT (fora da barra, no canto inferior direito) -->
   <button class="chatbot-float-btn" onclick="toggleChat()" title="Abrir Assistente Virtual" aria-label="Abrir Assistente Virtual">
       <svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M416 192c0-88.4-93.1-160-208-160S0 103.6 0 192c0 34.3 14.1 65.9 38 92-13.4 30.2-35.5 54.2-35.8 54.5-2.2 2.3-2.8 5.7-1.5 8.7S4.8 352 8 352c36.6 0 66.9-12.3 88.7-25 32.2 15.7 70.3 25 111.3 25 114.9 0 208-71.6 208-160zm122 220c23.9-26 38-57.7 38-92 0-66.9-53.5-124.2-129.3-148.1.9 6.6 1.3 13.3 1.3 20.1 0 105.9-107.7 192-240 192-10.8 0-21.3-.8-31.7-1.9C207.8 439.6 281.8 480 368 480c41 0 79.1-9.2 111.3-25 21.8 12.7 52.1 25 88.7 25 3.2 0 6.1-1.9 7.3-4.8 1.3-2.9.7-6.3-1.5-8.7-.3-.3-22.4-24.2-35.8-54.5z"/>
       </svg>
-    </button>
+  </button>
 
   <script>
+    /* LÓGICA DO CHATBOT AUTOMÁTICO DO RTEC */
+    const CHAT_CONFIG = {
+      respostas: [
+        { chaves: ["oi", "ola", "bom dia", "boa tarde", "boa noite", "oie"], resposta: "Olá! 😊 Bem-vindo(a) à RTEC! Sou seu assistente virtual. Como posso ajudar com seus agendamentos ou dúvidas?" },
+        { chaves: ["horario", "funcionamento", "abre", "fecha", "aberto", "hora", "atendimento"], resposta: "🕒 Atendemos para recebimento e coletas de Segunda a Sexta-feira, das 09:00 às 17:00." },
+        { chaves: ["endereco", "onde", "local", "localizacao", "chegar", "ecoponto", "franco da rocha", "rua"], resposta: "📍 Estamos localizados na Rodovia Luiz Salomão Chama, 240 – Vila Ramos, Franco da Rocha – SP (CEP 07857-050)." },
+        { chaves: ["agendar", "agendamento", "como agendar", "agendar coleta", "coleta"], resposta: "📅 Para agendar uma coleta, acesse a aba AGENDAMENTO, informe seu e-mail, perfil, o tipo de resíduo, data e horário." },
+        { chaves: ["residuo", "residuos", "material", "materiais", "aceitam", "aceita", "eletronico", "eletronicos"], resposta: "♻️ Aceitamos resíduos eletrônicos (computadores, notebooks, monitores, celulares, placas eletrônicas) e materiais recicláveis." },
+        { chaves: ["cadastro", "criar conta", "login", "senha", "entrar", "perfil", "monitor", "funcionario"], resposta: "🔐 O cadastro e login são destinados a Funcionários (Painel Admin) e Monitores (Triagem e Controle de Materiais)." },
+        { chaves: ["feedback", "avaliar", "avaliacao", "nota"], resposta: "⭐ Agradecemos pelo feedback! Ele é essencial para melhorarmos nossos serviços." },
+        { chaves: ["obrigado", "obrigada", "valeu", "vlw", "obg", "tchau"], resposta: "Por nada! 💚 Se precisar de mais alguma informação, estou à disposição!" }
+      ],
+      respostaPadrao: "Não entendi muito bem. Você pode escolher uma das opções abaixo ou perguntar sobre 'horários', 'endereço', 'agendamento' ou 'resíduos'."
+    };
+
+    function normalizarTexto(t) { return t.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim(); }
+
+    function adicionarMensagemChat(texto, quem) {
+      const body = document.getElementById("chatbot-body");
+      if (!body) return;
+      const msg = document.createElement("div");
+      msg.className = "chatbot-message " + quem;
+      msg.textContent = texto;
+      body.appendChild(msg);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function obterRespostaBot(texto) {
+      const norm = " " + normalizarTexto(texto) + " ";
+      for (const item of CHAT_CONFIG.respostas) {
+        if (item.chaves.some(c => norm.includes(" " + c + " ") || norm.includes(" " + c) || norm.includes(c + " "))) {
+          return item.resposta;
+        }
+      }
+      return CHAT_CONFIG.respostaPadrao;
+    }
+
+    function enviarMensagemChat(texto) {
+      if (!texto || !texto.trim()) return;
+      adicionarMensagemChat(texto.trim(), "user");
+      
+      const chips = document.getElementById("chatbot-chips");
+      if (chips) chips.style.display = "none";
+
+      setTimeout(() => {
+        const resp = obterRespostaBot(texto);
+        adicionarMensagemChat(resp, "bot");
+      }, 350);
+    }
+
+    function processarEnvioChat(e) {
+      if (e) e.preventDefault();
+      const input = document.getElementById("chatbot-input");
+      if (!input) return;
+      const val = input.value;
+      if (!val.trim()) return;
+      enviarMensagemChat(val);
+      input.value = "";
+    }
+
+    function toggleChat() {
+      const modal = document.getElementById("chatbot-modal");
+      if (!modal) return;
+      modal.classList.toggle("active");
+      if (modal.classList.contains("active")) {
+        const input = document.getElementById("chatbot-input");
+        if (input) input.focus();
+      }
+    }
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        const modal = document.getElementById("chatbot-modal");
+        if (modal && modal.classList.contains("active")) modal.classList.remove("active");
+      }
+    });
+
+    /* DEMAIS LÓGICAS DA PÁGINA */
     function aplicarConfiguracoesGlobais() {
       if (localStorage.getItem('rtec_dark') === 'true') {
         document.body.classList.add('dark-mode');
@@ -357,11 +444,6 @@
       }
     }
 
-    function toggleChat() {
-      document.getElementById('chatbot-modal').classList.toggle('active');
-    }
-
-    // LÓGICA DO FORMULÁRIO DE FEEDBACK ALINHADA AO BANCO
     let notaSelecionada = 0;
     const stars = document.querySelectorAll('#star-rating .material-symbols-outlined');
 
@@ -420,7 +502,6 @@
       btnSubmit.disabled = true;
 
       try {
-        // 1. Insere o feedback principal
         const { data: feedbackData, error: feedbackError } = await _supabase
           .from('tbl_feedback')
           .insert([{ 
@@ -436,7 +517,6 @@
         
         const idFeedbackGerado = feedbackData[0].id_feedback;
 
-        // 2. Função para buscar o ID da tag no banco
         const buscarIdTag = async (nomeTagBusca, tipo) => {
           const { data, error } = await _supabase
             .from('tbl_tipotag_feedback')
@@ -448,7 +528,6 @@
           return data ? data.id_tag : null;
         };
 
-        // Mapeamento dos textos dos botões para as tags do banco
         const mapaTags = {
           'Design Visual': 'Design',
           'Rapidez da Navegação': 'Rapidez',
@@ -458,19 +537,16 @@
 
         const tagsParaInserir = [];
 
-        // Prepara tag positiva
         if (maisGostou && mapaTags[maisGostou]) {
           const idTagPos = await buscarIdTag(mapaTags[maisGostou], 'positivo');
           if (idTagPos) tagsParaInserir.push({ id_feedback: idFeedbackGerado, id_tag: idTagPos });
         }
 
-        // Prepara tag negativa
         if (melhorar && mapaTags[melhorar]) {
           const idTagNeg = await buscarIdTag(mapaTags[melhorar], 'negativo');
           if (idTagNeg) tagsParaInserir.push({ id_feedback: idFeedbackGerado, id_tag: idTagNeg });
         }
 
-        // 3. Insere na tabela de ligação (Junction)
         if (tagsParaInserir.length > 0) {
           const { error: junctionError } = await _supabase
             .from('tbl_feedback_tag_junction')
