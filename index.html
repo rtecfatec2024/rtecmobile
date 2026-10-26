@@ -142,6 +142,14 @@
     body.dark-mode .rtec-footer { background: #14532d; border-top-color: #059669; }
     @media (max-width: 480px) { .rtec-footer { padding: 1.6rem 1rem 2rem; } .rtec-footer .copyright { font-size: .9rem; } .rtec-footer .footer-tagline { font-size: .85rem; } .rtec-footer .footer-social { margin-bottom: 1.35rem; } }
   </style>
+
+   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+     const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co/rest/v1/';
+    const SUPABASE_ANON_KEY = 'sb_publishable_Yja3XcdOkwAOY2RHK6wS2A_LyazoP1c';
+    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  </script>
+  
 </head>
 <body>
 
