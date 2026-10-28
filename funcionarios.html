@@ -59,7 +59,7 @@
     /* HEADER PADRONIZADO */
     .header-wrap { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
     .header-wrap .mainbar { background: #15803d; display: flex; justify-content: space-between; align-items: center; padding: 0.625rem 1rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: background 0.3s; min-height: 4.375rem; }
-    .logo-area { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; border-radius: 1.5rem; padding: 0.25rem 0.5rem; flex-shrink: 0; }
+    .logo-area { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; background: transparent; border-radius: 1.5rem; padding: 0.25rem 0.5rem; flex-shrink: 0; }
     .logo-area img { height: 2.25rem; width: auto; display: block; object-fit: contain; }
     .mainbar .nav-links { display: flex; gap: 1rem; align-items: center; }
     .mainbar .nav-links a { color: #ffffff; opacity: 0.8; text-decoration: none; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; transition: all 0.2s; padding: 0.5rem 0.75rem; border-radius: 0.5rem; }
@@ -304,9 +304,9 @@
           <div class="card" style="padding: 0; overflow: hidden;">
             <div style="padding: 1.125rem 1.25rem; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
               <h3 style="font-size: 1rem; font-weight: 800;"><i class="fas fa-comment-dots" style="color:#16a34a;"></i> Feedbacks dos Usuários</h3>
-              <a href="feedback.html" class="btn btn-blue" style="text-decoration:none;">Ver Todos</a>
+              <button type="button" id="btnVerTodos" class="btn btn-blue">Ver Todos</button>
             </div>
-            <div id="listaFeedbacks" style="padding: 0 1.25rem;"></div>
+            <div id="listaFeedbacks" style="padding: 0 1.25rem; max-height: 260px; overflow-y: auto; transition: max-height .3s;"></div>
           </div>
         </section>
 
@@ -518,7 +518,7 @@
 
     function formatData(iso) {
       if (!iso) return 'N/D';
-      const d = new Date(iso + 'T00:00:00');
+      const d = String(iso).length <= 10 ? new Date(iso + 'T00:00:00') : new Date(iso);
       return d.toLocaleDateString('pt-BR');
     }
 
@@ -527,7 +527,7 @@
         const [rAgen, rMat, rFeed] = await Promise.all([
           _supabase.from('tbl_agendamento').select('*').order('data_agendada', { ascending: false }),
           _supabase.from('tbl_material_cadastrado').select('*, tbl_tipomaterial(nome_material), tbl_usuario(nome_usuario)').order('data_cadastro', { ascending: false }),
-          _supabase.from('tbl_feedback').select('*').order('data_envio', { ascending: false }).limit(5),
+          _supabase.from('tbl_feedback').select('*').order('data_envio', { ascending: false }),
         ]);
         
         if (rAgen.error) console.warn("Aviso Agendamentos:", rAgen.error);
@@ -543,7 +543,8 @@
         DEMO_MODE = true;
         agendamentos = demoAgendamentos;
         materiais = demoMateriais;
-        feedbacks = demoFeedbacks;
+        // Só usa feedbacks de demonstração se der erro de verdade (não quando está só "vazio")
+        if (e.message !== 'vazio') feedbacks = demoFeedbacks;
         console.warn('Supabase indisponível — exibindo dados de demonstração.');
       }
       renderTudo();
@@ -663,6 +664,14 @@
       if (item) item.status = 'Concluido';
       renderTudo();
     }
+
+    // Botão "Ver Todos": abre e fecha a lista maior, sem sair da página
+    let feedbacksAbertos = false;
+    document.getElementById('btnVerTodos').addEventListener('click', () => {
+      feedbacksAbertos = !feedbacksAbertos;
+      document.getElementById('listaFeedbacks').style.maxHeight = feedbacksAbertos ? '70vh' : '260px';
+      document.getElementById('btnVerTodos').textContent = feedbacksAbertos ? 'Ver Menos' : 'Ver Todos';
+    });
 
     function renderFeedbacks() {
       document.getElementById('listaFeedbacks').innerHTML = feedbacks.length
