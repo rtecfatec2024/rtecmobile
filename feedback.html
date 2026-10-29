@@ -12,7 +12,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-     const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co';
+    const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Yja3XcdOkwAOY2RHK6wS2A_LyazoP1c';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
@@ -96,6 +96,78 @@
     .btn-submit:hover { background: #15803d; }
     body.dark-mode .btn-submit { background: #15803d; }
     body.dark-mode .btn-submit:hover { background: #16a34a; }
+
+    /* SEÇÃO DE AVALIAÇÕES REALIZADAS */
+    .evaluations-container { 
+      width: 100%; 
+      margin-top: 3.5rem; 
+      margin-bottom: 2.5rem; 
+    }
+    .evaluations-header { 
+      font-size: 1.25rem; 
+      font-weight: 800; 
+      color: #ffffff; 
+      margin-bottom: 1.25rem; 
+      display: flex; 
+      align-items: center; 
+      gap: 0.5rem; 
+    }
+
+    #lista-avaliacoes {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem !important;
+    }
+
+    .evaluation-item-card { 
+      background: #ffffff; 
+      border-radius: 1.25rem; 
+      padding: 1.5rem 1.75rem; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.12); 
+      border: 1px solid #e2e8f0; 
+      transition: background 0.3s, border-color 0.3s; 
+      margin-bottom: 1.5rem;
+    }
+    .evaluation-item-card:last-child {
+      margin-bottom: 0;
+    }
+
+    body.dark-mode .evaluation-item-card { 
+      background: #1e293b; 
+      border-color: #334155; 
+      color: #f8fafc; 
+    }
+    
+    .evaluation-card-header { 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      margin-bottom: 0.85rem; 
+      flex-wrap: wrap; 
+      gap: 0.5rem; 
+    }
+    .evaluation-card-user { 
+      font-weight: 700; 
+      font-size: 0.95rem; 
+      color: #1e293b; 
+      display: flex; 
+      align-items: center; 
+      gap: 0.35rem; 
+    }
+    body.dark-mode .evaluation-card-user { color: #f8fafc; }
+    .evaluation-card-date { font-size: 0.78rem; color: #64748b; font-weight: 500; }
+    body.dark-mode .evaluation-card-date { color: #94a3b8; }
+    
+    .evaluation-card-stars { display: flex; gap: 0.2rem; color: #eab308; margin-bottom: 0.5rem; }
+    .evaluation-card-stars .material-symbols-outlined { font-size: 1.3rem; font-variation-settings: 'FILL' 1; }
+    .evaluation-card-stars .material-symbols-outlined.empty { color: #cbd5e1; font-variation-settings: 'FILL' 0; }
+    body.dark-mode .evaluation-card-stars .material-symbols-outlined.empty { color: #475569; }
+
+    .evaluation-card-badge { display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.8rem; font-weight: 700; padding: 0.3rem 0.75rem; border-radius: 1rem; margin-top: 0.25rem; }
+    .evaluation-card-badge.recomenda { background: #dcfce7; color: #15803d; }
+    .evaluation-card-badge.nao-recomenda { background: #fee2e2; color: #b91c1c; }
+    body.dark-mode .evaluation-card-badge.recomenda { background: #14532d; color: #86efac; }
+    body.dark-mode .evaluation-card-badge.nao-recomenda { background: #7f1d1d; color: #fca5a5; }
 
     .header-wrap { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; }
     .header-wrap .topbar { background: #f1f5f9; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: flex-end; align-items: center; gap: 0.25rem; padding: 0.375rem 1rem; transition: background 0.3s; }
@@ -268,6 +340,15 @@
             <span class="material-symbols-outlined">send</span> Enviar Avaliação
           </button>
         </form>
+
+        <!-- CONTAINER ONDE AS AVALIAÇÕES SERÃO RENDERIZADAS -->
+        <div class="evaluations-container">
+          <h2 class="evaluations-header">
+            <span class="material-symbols-outlined">rate_review</span> Avaliações da Comunidade
+          </h2>
+          <div id="lista-avaliacoes"></div>
+        </div>
+
       </div>
     </main>
   </div>
@@ -414,7 +495,11 @@
       if (fonte === 'large') document.documentElement.classList.add('font-large');
       if (fonte === 'xlarge') document.documentElement.classList.add('font-xlarge');
     }
-    window.addEventListener('DOMContentLoaded', aplicarConfiguracoesGlobais);
+
+    window.addEventListener('DOMContentLoaded', () => {
+      aplicarConfiguracoesGlobais();
+      carregarAvaliacoes();
+    });
 
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
@@ -484,6 +569,73 @@
       btnElement.classList.add('selected');
       if (categoria === 'gostou') document.getElementById('mais-gostou').value = valor;
       else document.getElementById('melhorar').value = valor;
+    }
+
+    /* CARREGAR AVALIAÇÕES DO SUPABASE */
+    async function carregarAvaliacoes() {
+      const container = document.getElementById('lista-avaliacoes');
+      if (!container) return;
+
+      container.innerHTML = '<p style="color:#ffffff; text-align:center;">Carregando avaliações...</p>';
+
+      try {
+        const { data, error } = await _supabase
+          .from('tbl_feedback')
+          .select('id_feedback, avaliacao_estrelas, recomendaria, data_envio')
+          .order('data_envio', { ascending: false });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          container.innerHTML = '<div class="evaluation-item-card"><p style="text-align:center; color:#64748b;">Nenhuma avaliação registrada até o momento.</p></div>';
+          return;
+        }
+
+        container.innerHTML = '';
+
+        data.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'evaluation-item-card';
+
+          const dataFormatada = item.data_envio 
+            ? new Date(item.data_envio).toLocaleDateString('pt-BR', {
+                day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+              })
+            : 'Data não informada';
+
+          let estrelasHtml = '';
+          for (let i = 1; i <= 5; i++) {
+            const isEmpty = i > item.avaliacao_estrelas ? 'empty' : '';
+            estrelasHtml += `<span class="material-symbols-outlined ${isEmpty}">star</span>`;
+          }
+
+          const recomendariaTexto = (item.recomendaria && item.recomendaria.toLowerCase() === 'sim') 
+            ? '<span class="evaluation-card-badge recomenda"><span class="material-symbols-outlined" style="font-size:1rem;">thumb_up</span> Recomendou a plataforma</span>'
+            : '<span class="evaluation-card-badge nao-recomenda"><span class="material-symbols-outlined" style="font-size:1rem;">thumb_down</span> Não recomendou</span>';
+
+          card.innerHTML = `
+            <div class="evaluation-card-header">
+              <div class="evaluation-card-user">
+                <span class="material-symbols-outlined" style="color:#16a34a;">account_circle</span>
+                Avaliação #${item.id_feedback}
+              </div>
+              <div class="evaluation-card-date">${dataFormatada}</div>
+            </div>
+            <div class="evaluation-card-stars">
+              ${estrelasHtml}
+            </div>
+            <div>
+              ${recomendariaTexto}
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+
+      } catch (err) {
+        console.error('Erro ao buscar avaliações:', err);
+        container.innerHTML = '<div class="evaluation-item-card"><p style="text-align:center; color:#ef4444;">Não foi possível carregar as avaliações no momento.</p></div>';
+      }
     }
 
     async function enviarFeedback(event) {
@@ -564,6 +716,8 @@
         document.querySelector('.btn-recommend.sim').classList.remove('opacity-off');
         document.querySelector('.btn-recommend.nao').classList.add('opacity-off');
         document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+
+        await carregarAvaliacoes();
 
       } catch (err) {
         console.error("Erro completo:", err);
