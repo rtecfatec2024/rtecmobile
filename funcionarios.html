@@ -166,7 +166,6 @@
     .star-empty { color: #cbd5e1; }
     body.dark-mode .star-empty { color: #475569; }
 
-    /* ESTILOS DA LISTA DE FEEDBACKS */
     .feedback-item { padding: 1.2rem; border: 1px solid #e2e8f0; border-radius: 1rem; background: #ffffff; margin-bottom: 1rem; transition: background 0.3s, border-color 0.3s; }
     body.dark-mode .feedback-item { background: #0f172a; border-color: #334155; }
     .feedback-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
@@ -188,7 +187,6 @@
 
     .accessibility-buttons .acc-btn { width: 2.5rem; height: 2.5rem; padding: 0; background: #1351b4; }
 
-    /* ESTILOS DO CHATBOT APRIMORADO */
     .chatbot-modal { position: fixed; bottom: 6rem; right: 1.5rem; width: 21rem; background: #ffffff; border-radius: 1rem; box-shadow: 0 10px 30px rgba(0,0,0,0.2); display: none; flex-direction: column; z-index: 10000; overflow: hidden; border: 1px solid #e2e8f0; }
     .chatbot-modal.active { display: flex; }
     .chatbot-header { background: #16a34a; color: white; padding: 1rem; display: flex; justify-content: space-between; align-items: center; font-weight: 700; }
@@ -514,29 +512,12 @@
       }
     });
 
-    let DEMO_MODE = false;
     let agendamentos = [];
     let materiais = [];
     let feedbacks = [];
-    let erroMateriais = '';
     let filtroAtual = 'geral';
     let feedbacksCarregados = false;
     const ENDERECO_COLETA = 'Ecoponto - Franco da Rocha/SP';
-
-    const demoAgendamentos = [
-      { id: 1, protocolo_agendamento: 'RTEC-2026-001', email_usuario_agendamento: 'joao@email.com', nome_residuo: 'Monitor CRT', status: 'Concluido', data_agendamento: '2026-10-20', hora_agendamento: '09:00' },
-      { id: 2, protocolo_agendamento: 'RTEC-2026-002', email_usuario_agendamento: 'empresa@email.com', nome_residuo: 'Notebook', status: 'Agendado', data_agendamento: '2026-10-22', hora_agendamento: '14:00' },
-      { id: 3, protocolo_agendamento: 'RTEC-2026-003', email_usuario_agendamento: 'maria@email.com', nome_residuo: 'Cabo de rede', status: 'Pendente', data_agendamento: '2026-10-23', hora_agendamento: '10:30' },
-    ];
-    const demoMateriais = [
-      { id: 1, nome_material: 'Monitor LCD', destino: 'aula', status_processamento: 'Processado', monitor_nome: 'Ana Souza', data_cadastro: '2026-10-18' },
-      { id: 2, nome_material: 'Notebook', destino: 'aula', status_processamento: 'Em Espera', monitor_nome: 'Carlos Lima', data_cadastro: '2026-10-20' },
-      { id: 3, nome_material: 'Teclado', destino: 'coleta', status_processamento: 'Em Processo', monitor_nome: 'Ana Souza', data_cadastro: '2026-10-21' },
-    ];
-    const demoFeedbacks = [
-      { id_feedback: 1, avaliacao_estrelas: 5, recomendaria: 'sim', data_envio: '2026-10-20T14:00:00' },
-      { id_feedback: 2, avaliacao_estrelas: 4, recomendaria: 'sim', data_envio: '2026-10-19T10:30:00' },
-    ];
 
     function formatData(iso) {
       if (!iso) return 'N/D';
@@ -546,37 +527,84 @@
 
     async function carregarDados() {
       try {
-        const [rAgen, rMat] = await Promise.all([
-          _supabase.from('tbl_agendamento').select('*').order('data_agendada', { ascending: false }),
-          _supabase.from('tbl_material_cadastrado').select('*, tbl_tipomaterial(nome_material), tbl_usuario(nome_usuario)').order('data_cadastro', { ascending: false }),
-        ]);
-        
-        if (rAgen.error) console.warn("Aviso Agendamentos:", rAgen.error);
-        
-        let dadosMat = rMat.data;
-        erroMateriais = '';
-        if (rMat.error) {
-          console.error('Erro Materiais (com join):', rMat.error);
-          const r2 = await _supabase.from('tbl_material_cadastrado').select('*');
-          if (r2.error) {
-            console.error('Erro Materiais (sem join):', r2.error);
-            erroMateriais = r2.error.message;
-          } else {
-            dadosMat = r2.data;
-          }
-        }
+        // 1. Carrega Agendamentos (Aba Visão Geral)
+        const rAgen = await _supabase.from('tbl_agendamento').select('*');
+        if (rAgen.error) console.error('Erro ao carregar tbl_agendamento:', rAgen.error);
 
-        agendamentos = (rAgen.data || []).map(a => ({ ...a, nome_residuo: a.nome_residuo || 'Eletrônico', data_agendamento: a.data_agendada, hora_agendamento: a.hora_agendada }));
-        materiais = (dadosMat || []).map(m => ({ ...m, nome_material: m.tbl_tipomaterial?.nome_material || m.nome_material || 'Material', monitor_nome: m.tbl_usuario?.nome_usuario || m.monitor_nome || 'Monitor' }));
-        
-        if (!agendamentos.length && !materiais.length) throw new Error('vazio');
+        const { data: residuos, error: errResiduos } = await _supabase.from('tbl_tiporesiduo').select('*');
+        if (errResiduos) console.error('Erro ao carregar tbl_tiporesiduo:', errResiduos);
+
+        const mapResiduo = {};
+        (residuos || []).forEach(r => {
+          mapResiduo[r.id_tipo_residuo] = r.nome_residuo;
+        });
+
+        agendamentos = (rAgen.data || []).map(a => ({
+          ...a,
+          id: a.id_agendamento,
+          nome_residuo: a.nome_residuo || mapResiduo[a.id_tipo_residuo] || 'Resíduo Eletrônico',
+          data_agendamento: a.data_agendada || a.data_agendamento,
+          hora_agendamento: a.hora_agendada || a.hora_agendamento
+        }));
+
+        // 2. Carrega Materiais Educacionais e tabelas auxiliares separadamente
+        const rMat = await _supabase.from('tbl_material_cadastrado').select('*');
+        if (rMat.error) console.error('Erro RLS ou Query em tbl_material_cadastrado:', rMat.error);
+
+        const rTipoMat = await _supabase.from('tbl_tipomaterial').select('*');
+        if (rTipoMat.error) console.error('Erro RLS ou Query em tbl_tipomaterial:', rTipoMat.error);
+
+        const rTipoDest = await _supabase.from('tbl_tipodestino').select('*');
+        if (rTipoDest.error) console.error('Erro RLS ou Query em tbl_tipodestino:', rTipoDest.error);
+
+        const rUsers = await _supabase.from('tbl_usuario').select('*');
+        if (rUsers.error) console.error('Erro RLS ou Query em tbl_usuario:', rUsers.error);
+
+        const mapTipos = {};
+        (rTipoMat.data || []).forEach(t => {
+          mapTipos[t.id_tipo_material || t.id] = t.nome_material || t.nome;
+        });
+
+        const mapDestinos = {};
+        (rTipoDest.data || []).forEach(d => {
+          mapDestinos[d.id_tipo_destino || d.id] = d.nome_destino || d.nome;
+        });
+
+        const mapUsuarios = {};
+        (rUsers.data || []).forEach(u => {
+          mapUsuarios[u.id_usuario || u.id] = u.nome_usuario || u.nome || u.email;
+        });
+
+        materiais = (rMat.data || []).map(m => {
+          const idTipo = m.id_tipo_material;
+          const idDestino = m.id_tipo_destino;
+          const idMon = m.id_monitor || m.id_usuario;
+
+          const nomeMat = m.nome_material || mapTipos[idTipo] || `Material #${idTipo || m.id_material_cadastrado}`;
+          const nomeDestino = String(m.nome_destino || mapDestinos[idDestino] || '').toLowerCase();
+          
+          // Considera "coleta" se o nome indicar Coleta ou o ID for 1
+          const isColeta = nomeDestino.includes('coleta') || Number(idDestino) === 1;
+
+          return {
+            ...m,
+            id: m.id_material_cadastrado || m.id,
+            nome_material: nomeMat,
+            monitor_nome: mapUsuarios[idMon] || m.monitor_nome || 'Monitor Responsável',
+            destino: isColeta ? 'coleta' : 'aula',
+            id_tipo_destino: idDestino,
+            data_cadastro: m.data_cadastro || m.created_at || new Date().toISOString(),
+            status_processamento: m.status_processamento || m.status || 'Processado'
+          };
+        });
+
+        console.log("Agendamentos carregados:", agendamentos.length);
+        console.log("Materiais educacionais carregados:", materiais.length);
+
       } catch (e) {
-        DEMO_MODE = true;
-        agendamentos = demoAgendamentos;
-        materiais = demoMateriais;
-        feedbacks = demoFeedbacks;
-        console.warn('Supabase indisponível — exibindo dados de demonstração.');
+        console.error('Erro geral ao carregar dados:', e);
       }
+
       renderTudo();
     }
 
@@ -593,15 +621,15 @@
       const hoje = new Date().toISOString().slice(0, 10);
       const mesAtual = hoje.slice(0, 7);
       document.getElementById('statTotal').textContent = agendamentos.length;
-      document.getElementById('statProcessados').textContent = agendamentos.filter(a => a.status === 'Concluido').length;
-      document.getElementById('statMes').textContent = agendamentos.filter(a => (a.data_agendamento || '').startsWith(mesAtual)).length;
-      document.getElementById('statColetados').textContent = agendamentos.filter(a => a.status === 'Concluido').length;
+      document.getElementById('statProcessados').textContent = agendamentos.filter(a => a.status === 'Concluido' || a.status === 'Processado').length;
+      document.getElementById('statMes').textContent = agendamentos.filter(a => String(a.data_agendamento || '').startsWith(mesAtual)).length;
+      document.getElementById('statColetados').textContent = agendamentos.filter(a => a.status === 'Concluido' || a.status === 'Processado').length;
 
       const recentes = agendamentos.slice(0, 5);
       document.getElementById('tbodyRecentes').innerHTML = recentes.length
         ? recentes.map(a => `<tr onclick='abrirModalProtocolo(${JSON.stringify(a).replace(/'/g, "&#39;")})'>
             <td>${formatData(a.data_agendamento)}</td>
-            <td>${a.email_usuario_agendamento || 'N/D'}</td>
+            <td>${a.email_usuario_agendamento || a.email || 'N/D'}</td>
             <td>${a.nome_residuo || 'N/D'}</td>
             <td>${badgeStatus(a.status)}</td></tr>`).join('')
         : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhuma doação recente.</td></tr>';
@@ -609,7 +637,7 @@
       document.getElementById('listaRecentesMobile').innerHTML = recentes.length
         ? recentes.map(a => `<div class="row-mobile" onclick='abrirModalProtocolo(${JSON.stringify(a).replace(/'/g, "&#39;")})'>
             <div><strong style="font-size:0.85rem;">${a.nome_residuo || 'N/D'}</strong><br>
-            <span class="muted">${formatData(a.data_agendamento)} · ${a.email_usuario_agendamento || 'N/D'}</span></div>
+            <span class="muted">${formatData(a.data_agendamento)} · ${a.email_usuario_agendamento || a.email || 'N/D'}</span></div>
             ${badgeStatus(a.status)}</div>`).join('')
         : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhuma doação recente.</p>';
 
@@ -618,14 +646,18 @@
       aplicarFiltro(new URLSearchParams(location.search).get('filtro') || 'geral', true);
     }
 
+    function renderProtocolos() {
+      aplicarFiltro(filtroAtual, true);
+    }
+
     function filtrarAgendamentos(f) {
       const hoje = new Date().toISOString().slice(0, 10);
       const mesAtual = hoje.slice(0, 7);
       switch (f) {
         case 'total': return agendamentos;
-        case 'processados': return agendamentos.filter(a => a.status === 'Concluido');
-        case 'mes': return agendamentos.filter(a => (a.data_agendamento || '').startsWith(mesAtual));
-        case 'coletados': return agendamentos.filter(a => a.status === 'Concluido');
+        case 'processados': return agendamentos.filter(a => a.status === 'Concluido' || a.status === 'Processado');
+        case 'mes': return agendamentos.filter(a => String(a.data_agendamento || '').startsWith(mesAtual));
+        case 'coletados': return agendamentos.filter(a => a.status === 'Concluido' || a.status === 'Processado');
         case 'hoje': return agendamentos.filter(a => a.data_agendamento === hoje);
         default: return agendamentos;
       }
@@ -647,11 +679,11 @@
       document.getElementById('descProtocolos').textContent = t[1];
       document.getElementById('btnLimparFiltro').style.display = f === 'geral' ? 'none' : 'inline-flex';
 
-      ['cardTotal','cardProcessados','cardMes','cardColetados'].forEach(id => document.getElementById(id).classList.remove('selected'));
-      if (f === 'total') document.getElementById('cardTotal').classList.add('selected');
-      if (f === 'processados') document.getElementById('cardProcessados').classList.add('selected');
-      if (f === 'mes') document.getElementById('cardMes').classList.add('selected');
-      if (f === 'coletados') document.getElementById('cardColetados').classList.add('selected');
+      ['cardTotal','cardProcessados','cardMes','cardColetados'].forEach(id => document.getElementById(id)?.classList.remove('selected'));
+      if (f === 'total') document.getElementById('cardTotal')?.classList.add('selected');
+      if (f === 'processados') document.getElementById('cardProcessados')?.classList.add('selected');
+      if (f === 'mes') document.getElementById('cardMes')?.classList.add('selected');
+      if (f === 'coletados') document.getElementById('cardColetados')?.classList.add('selected');
 
       const termo = (document.getElementById('buscarProtocolo').value || '').toLowerCase();
       const filtrados = termo ? lista.filter(a => JSON.stringify(a).toLowerCase().includes(termo)) : lista;
@@ -660,17 +692,17 @@
         ? filtrados.map(a => `
           <div class="proto-card">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.625rem; gap:0.5rem; flex-wrap:wrap;">
-              <strong style="color:#15803d; font-family:monospace; font-size:0.9rem;">#${a.protocolo_agendamento || 'N/D'}</strong>
+              <strong style="color:#15803d; font-family:monospace; font-size:0.9rem;">#${a.protocolo_agendamento || a.id || 'N/D'}</strong>
               ${badgeStatus(a.status)}
             </div>
             <div style="font-size:0.82rem; display:flex; flex-direction:column; gap:0.375rem; color:inherit;">
-              <p><strong>E-mail:</strong> ${a.email_usuario_agendamento || 'N/D'}</p>
+              <p><strong>E-mail:</strong> ${a.email_usuario_agendamento || a.email || 'N/D'}</p>
               <p><strong>Resíduo:</strong> ${a.nome_residuo || 'N/D'}</p>
               <p><strong>Data:</strong> ${formatData(a.data_agendamento)} às ${a.hora_agendamento || '--:--'}</p>
             </div>
             <div style="margin-top:0.875rem; display:flex; justify-content:flex-end; gap:0.5rem; flex-wrap:wrap;">
               <button class="btn btn-blue" onclick='abrirModalProtocolo(${JSON.stringify(a).replace(/'/g, "&#39;")})'><i class="fas fa-eye"></i> Detalhes</button>
-              ${a.status !== 'Concluido' ? `<button class="btn btn-green" onclick="concluirAgendamento(${a.id})"><i class="fas fa-check"></i> Concluir</button>` : ''}
+              ${(a.status !== 'Concluido' && a.status !== 'Processado') ? `<button class="btn btn-green" onclick="concluirAgendamento(${a.id})"><i class="fas fa-check"></i> Concluir</button>` : ''}
             </div>
           </div>`).join('')
         : '<p class="muted" style="grid-column:1/-1; text-align:center; padding:1.5rem 0;">Nenhum registro encontrado.</p>';
@@ -683,15 +715,13 @@
 
     async function concluirAgendamento(id) {
       if (!confirm('Marcar este agendamento como CONCLUÍDO?')) return;
-      if (!DEMO_MODE) {
-        try {
-          const { error } = await _supabase.from('tbl_agendamento').update({ status: 'Concluido' }).eq('id_agendamento', id);
-          if (error) throw error;
-        } catch (e) { alert('Erro: ' + e.message); return; }
-      }
-      const item = agendamentos.find(a => a.id === id);
-      if (item) item.status = 'Concluido';
-      renderTudo();
+      try {
+        const { error } = await _supabase.from('tbl_agendamento').update({ status: 'Concluido' }).eq('id_agendamento', id);
+        if (error) throw error;
+        const item = agendamentos.find(a => a.id === id);
+        if (item) item.status = 'Concluido';
+        renderTudo();
+      } catch (e) { alert('Erro ao atualizar agendamento: ' + e.message); }
     }
 
     /* BUSCA E RENDERIZAÇÃO DOS FEEDBACKS DO SUPABASE */
@@ -709,15 +739,13 @@
         if (!feedbacksCarregados) {
           container.innerHTML = '<p style="text-align:center; color:#64748b; padding:1rem;">Carregando avaliações...</p>';
           try {
-            if (!DEMO_MODE) {
-              const { data, error } = await _supabase
-                .from('tbl_feedback')
-                .select('*')
-                .order('data_envio', { ascending: false });
+            const { data, error } = await _supabase
+              .from('tbl_feedback')
+              .select('*')
+              .order('id_feedback', { ascending: false });
 
-              if (error) throw error;
-              feedbacks = data || [];
-            }
+            if (error) throw error;
+            feedbacks = data || [];
             feedbacksCarregados = true;
             renderListaFeedbacks();
           } catch (err) {
@@ -739,7 +767,7 @@
 
       container.innerHTML = feedbacks.map(f => {
         const dataFormatada = f.data_envio 
-          ? new Date(f.data_envio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          ? new Date(f.data_envio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
           : 'Data N/D';
 
         let estrelasHtml = '';
@@ -773,34 +801,47 @@
     }
 
     function renderEducacional() {
+      // 1. Atualização dos Cards da Aba Material Educacional
       document.getElementById('statMatTotal').textContent = materiais.length;
-      document.getElementById('statMatAula').textContent = materiais.filter(m => m.destino === 'aula' || Number(m.id_tipo_destino) === 2).length;
-      document.getElementById('statMatPendente').textContent = materiais.filter(m => m.status_processamento === 'Em Espera').length;
-      document.getElementById('statMatColeta').textContent = materiais.filter(m => m.destino === 'coleta' || Number(m.id_tipo_destino) === 1).length;
+      
+      const matAula = materiais.filter(m => m.destino === 'aula' || Number(m.id_tipo_destino) === 2 || String(m.nome_destino || '').toLowerCase().includes('aula'));
+      const matColeta = materiais.filter(m => m.destino === 'coleta' || Number(m.id_tipo_destino) === 1 || String(m.nome_destino || '').toLowerCase().includes('coleta'));
+      const matPendente = materiais.filter(m => m.status_processamento === 'Em Espera' || m.status_processamento === 'Pendente');
 
+      document.getElementById('statMatAula').textContent = matAula.length;
+      document.getElementById('statMatPendente').textContent = matPendente.length;
+      document.getElementById('statMatColeta').textContent = matColeta.length;
+
+      // 2. Gráfico Top 5 Materiais
       const contagem = {};
-      materiais.forEach(m => { const k = m.nome_material || 'Outros'; contagem[k] = (contagem[k] || 0) + 1; });
+      materiais.forEach(m => { 
+        const k = m.nome_material || 'Outros'; 
+        contagem[k] = (contagem[k] || 0) + 1; 
+      });
       const top = Object.entries(contagem).sort((a, b) => b[1] - a[1]).slice(0, 5);
       const cores = ['#16a34a', '#2563eb', '#9333ea', '#ea580c', '#dc2626'];
+
       document.getElementById('listaTiposMaterial').innerHTML = top.length
         ? top.map(([nome, qtd], i) => {
             const pct = materiais.length ? Math.round((qtd / materiais.length) * 100) : 0;
-            return `<div><div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;"><span>${nome}</span><span class="muted">${pct}%</span></div>
-              <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:${cores[i % 5]};"></div></div></div>`;
+            return `<div>
+              <div style="display:flex; justify-content:space-between; font-size:0.82rem; margin-bottom:0.25rem;">
+                <span>${nome}</span>
+                <span class="muted">${pct}% (${qtd})</span>
+              </div>
+              <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:${cores[i % 5]};"></div></div>
+            </div>`;
           }).join('')
-        : '<p class="muted" style="text-align:center;">Nenhum material cadastrado.</p>';
+        : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhum material cadastrado.</p>';
 
-      if (erroMateriais) {
-        document.getElementById('listaTiposMaterial').innerHTML =
-          '<p style="color:#dc2626; font-size:0.82rem;">Erro ao buscar materiais no banco: ' + erroMateriais + '</p>';
-      }
-
+      // 3. Tendência Mensal
       const porMes = {};
       materiais.forEach(m => {
-        const mes = (m.data_cadastro || '').slice(0, 7);
-        if (!mes) return;
+        const mes = String(m.data_cadastro || '').slice(0, 7);
+        if (!mes || mes.length < 7) return;
         porMes[mes] = (porMes[mes] || 0) + 1;
       });
+
       const meses = Object.entries(porMes).sort().reverse();
       document.getElementById('listaTendencia').innerHTML = meses.length
         ? meses.map(([mes, total], i) => {
@@ -811,27 +852,35 @@
               else if (total < anterior) { icone = 'fas fa-arrow-down'; cor = '#dc2626'; }
             }
             const [ano, mm] = mes.split('-');
-            const nomeMes = new Date(ano, mm - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            const nomeMes = new Date(ano, Number(mm) - 1, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
             return `<div class="month-row">
               <div style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem 1rem; cursor:pointer;" onclick="toggleMonthDetail(this)">
                 <span style="font-weight:600; font-size:0.85rem; text-transform:capitalize;">${nomeMes}</span>
                 <span style="font-weight:800; font-size:0.85rem; color:${cor};"><i class="${icone}" style="margin-right:0.375rem;"></i>${total} itens<i class="fas fa-chevron-down" style="margin-left:0.5rem; font-size:0.65rem; color:#94a3b8;"></i></span>
               </div>
-              <div class="month-detail"><strong>Itens no mês:</strong> ${total}</div>
+              <div class="month-detail"><strong>Itens cadastrados no mês:</strong> ${total}</div>
             </div>`;
           }).join('')
-        : '<p class="muted" style="text-align:center;">Nenhum histórico mensal.</p>';
+        : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhum histórico mensal.</p>';
 
-      const paraAula = materiais.filter(m => m.destino === 'aula' || Number(m.id_tipo_destino) === 2).slice(0, 5);
-      document.getElementById('tbodyMateriais').innerHTML = paraAula.length
-        ? paraAula.map(m => `<tr><td>${formatData(m.data_cadastro)}</td><td>${m.nome_material || 'N/D'}</td><td>${m.monitor_nome || 'N/D'}</td><td>${badgeStatus(m.status_processamento)}</td></tr>`).join('')
-        : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhum material para aula.</td></tr>';
-      document.getElementById('listaMateriaisMobile').innerHTML = paraAula.length
-        ? paraAula.map(m => `<div class="row-mobile">
+      // 4. Lista e Tabela de Itens para Aulas
+      const listaExibir = matAula.length > 0 ? matAula.slice(0, 10) : materiais.slice(0, 10);
+
+      document.getElementById('tbodyMateriais').innerHTML = listaExibir.length
+        ? listaExibir.map(m => `<tr>
+            <td>${formatData(m.data_cadastro)}</td>
+            <td>${m.nome_material || 'N/D'}</td>
+            <td>${m.monitor_nome || 'N/D'}</td>
+            <td>${badgeStatus(m.status_processamento)}</td>
+          </tr>`).join('')
+        : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhum material destinado para aulas registrado.</td></tr>';
+      
+      document.getElementById('listaMateriaisMobile').innerHTML = listaExibir.length
+        ? listaExibir.map(m => `<div class="row-mobile">
             <div><strong style="font-size:0.85rem;">${m.nome_material || 'N/D'}</strong><br>
             <span class="muted">${formatData(m.data_cadastro)} · ${m.monitor_nome || 'N/D'}</span></div>
             ${badgeStatus(m.status_processamento)}</div>`).join('')
-        : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhum material para aula.</p>';
+        : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhum material destinado para aulas registrado.</p>';
     }
 
     function showReport(tipo) {
@@ -842,8 +891,8 @@
     }
 
     function abrirModalProtocolo(a) {
-      document.getElementById('protocoloNumero').textContent = '#' + (a.protocolo_agendamento || 'N/D');
-      document.getElementById('protocoloEmail').textContent = a.email_usuario_agendamento || 'N/D';
+      document.getElementById('protocoloNumero').textContent = '#' + (a.protocolo_agendamento || a.id || 'N/D');
+      document.getElementById('protocoloEmail').textContent = a.email_usuario_agendamento || a.email || 'N/D';
       document.getElementById('protocoloResiduo').textContent = a.nome_residuo || 'N/D';
       document.getElementById('protocoloData').textContent = formatData(a.data_agendamento);
       document.getElementById('protocoloHora').textContent = a.hora_agendamento || 'N/D';
