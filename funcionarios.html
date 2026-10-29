@@ -19,7 +19,7 @@
       window.location.href = 'login.html'; 
     }
     
-     const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co';
+    const SUPABASE_URL = 'https://gnxxntzzvvaeusbnqfvx.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_Yja3XcdOkwAOY2RHK6wS2A_LyazoP1c';
     const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   </script>
@@ -31,7 +31,7 @@
     html.font-xlarge { font-size: 22px; }
     html.daltonism-mode { filter: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg"><filter id="daltonism"><feColorMatrix type="matrix" values="0.35 0.7 -0.05 0 0 -0.15 1.15 0.05 0 0 0.1 0.1 0.8 0 0 0 0 0 1 0"/></filter></svg>#daltonism') contrast(120%); }
 
-    /* BARRA DE ACESSIBILIDADE (VERTICAL, LATERAL DIREITA, JUNTO DO VLIBRAS) */
+    /* BARRA DE ACESSIBILIDADE */
     .accessibility-sidebar { position: fixed; top: 50%; right: 0.75rem; z-index: 9999; }
     .accessibility-buttons { position: fixed; top: calc(50% + 1.8rem); right: 0.60rem; display: flex; flex-direction: column; gap: 0.5rem; z-index: 9999; }
     .accessibility-group { display: flex; flex-direction: column; gap: 0.5rem; align-items: center; }
@@ -150,7 +150,7 @@
     .modal-overlay.open { display: flex; }
     .modal-box { background: #ffffff; border-radius: 1.25rem; max-width: 26rem; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.75rem; position: relative; }
     body.dark-mode .modal-box { background: #1e293b; color: #f8fafc; }
-    /* Caixas de dentro do modal de protocolo (claro e escuro) */
+    
     .proto-num-box { background:#f0fdf4; border:2px solid #bbf7d0; border-radius:0.75rem; padding:0.875rem; margin-bottom:1rem; }
     .proto-num-label { font-size:0.75rem; color:#64748b; }
     .proto-info { text-align:left; background:#f8fafc; border-radius:0.75rem; padding:1rem; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem; color:#0f172a; }
@@ -166,7 +166,18 @@
     .star-empty { color: #cbd5e1; }
     body.dark-mode .star-empty { color: #475569; }
 
-    /* VLibras: força o mesmo tamanho, cor e alinhamento dos outros botões */
+    /* ESTILOS DA LISTA DE FEEDBACKS */
+    .feedback-item { padding: 1.2rem; border: 1px solid #e2e8f0; border-radius: 1rem; background: #ffffff; margin-bottom: 1rem; transition: background 0.3s, border-color 0.3s; }
+    body.dark-mode .feedback-item { background: #0f172a; border-color: #334155; }
+    .feedback-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem; }
+    .feedback-item-title { font-weight: 700; font-size: 0.95rem; color: #1e293b; display: flex; align-items: center; gap: 0.35rem; }
+    body.dark-mode .feedback-item-title { color: #f8fafc; }
+    .feedback-badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; font-weight: 700; padding: 0.25rem 0.65rem; border-radius: 1rem; margin-top: 0.5rem; }
+    .feedback-badge.recomenda { background: #dcfce7; color: #15803d; }
+    .feedback-badge.nao-recomenda { background: #fee2e2; color: #b91c1c; }
+    body.dark-mode .feedback-badge.recomenda { background: #14532d; color: #86efac; }
+    body.dark-mode .feedback-badge.nao-recomenda { background: #7f1d1d; color: #fca5a5; }
+
     .accessibility-group { width: 2.5rem; align-items: stretch; }
     .accessibility-group [vw],
     .accessibility-group [vw].enabled { position: static !important; display: block !important; width: 2.5rem !important; height: 2.5rem !important; min-width: 0 !important; margin: 0 !important; padding: 0 !important; inset: auto !important; transform: none !important; }
@@ -175,7 +186,6 @@
     .accessibility-group div[vw-access-button] * { display: none !important; }
     .accessibility-group div[vw-access-button]::before { content: ""; width: 1.75rem; height: 1.75rem; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2a2 2 0 0 1 2 2v6.5l1-.5a1.5 1.5 0 0 1 2.5 1.3v2.2a1.5 1.5 0 0 1-2.5 1.3l-1-.5v1.5a4 4 0 0 1-8 0V9.2a1.5 1.5 0 0 1 2.5-1.3l1 .5V4a2 2 0 0 1 2-2zM6 7a1 1 0 0 0-1 1v4a1 1 0 0 0 2 0V8a1 1 0 0 0-1-1zm10 2a1 1 0 0 0-1 1v2a1 1 0 0 0 2 0v-2a1 1 0 0 0-1-1z"/><path d="M12 3a1 1 0 0 0-1 1v9l-2-1V8a1 1 0 0 0-2 0v6.5a3 3 0 0 0 6 0V4a1 1 0 0 0-1-1z"/></svg>') center/contain no-repeat; }
 
-    /* Os 2 botões de acessibilidade com exatamente o mesmo tamanho */
     .accessibility-buttons .acc-btn { width: 2.5rem; height: 2.5rem; padding: 0; background: #1351b4; }
 
     /* ESTILOS DO CHATBOT APRIMORADO */
@@ -314,9 +324,9 @@
           <div class="card" style="padding: 0; overflow: hidden;">
             <div style="padding: 1.125rem 1.25rem; border-bottom: 1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
               <h3 style="font-size: 1rem; font-weight: 800;"><i class="fas fa-comment-dots" style="color:#16a34a;"></i> Feedbacks dos Usuários</h3>
-              <button type="button" id="btnVerTodos" class="btn btn-blue">Ver Todos</button>
+              <button type="button" id="btnVerTodos" class="btn btn-blue" onclick="toggleMostrarFeedbacks()">Ver Todos</button>
             </div>
-            <div id="listaFeedbacks" style="padding: 0 1.25rem; max-height: 260px; overflow-y: auto; transition: max-height .3s;"></div>
+            <div id="listaFeedbacks" style="display: none; padding: 1.25rem; max-height: 500px; overflow-y: auto; transition: all 0.3s ease;"></div>
           </div>
         </section>
 
@@ -406,25 +416,25 @@
     </form>
   </div>
 
-  <!-- VLIBRAS (caixa própria, no meio da lateral direita) -->
+  <!-- VLIBRAS -->
   <div class="accessibility-sidebar">
     <div class="accessibility-group">
       <div vw class="enabled" title="VLibras - Libras"></div>
     </div>
   </div>
 
-  <!-- BOTÕES DE ACESSIBILIDADE (caixa própria, logo abaixo do VLibras) -->
+  <!-- BOTÕES DE ACESSIBILIDADE -->
   <div class="accessibility-buttons">
     <button class="acc-btn" onclick="mudarFonte()" title="Aumentar / Reduzir Fonte">A+</button>
     <button class="acc-btn" onclick="toggleDaltonismoAPI()" title="Filtro para Daltonismo"><span class="material-symbols-outlined" style="font-size:1.125rem;">visibility</span></button>
   </div>
 
-  <!-- BOTÃO DO CHATBOT (fora da barra, no canto inferior direito) -->
+  <!-- BOTÃO DO CHATBOT -->
   <button class="chatbot-float-btn" onclick="toggleChat()" title="Abrir Assistente Virtual" aria-label="Abrir Assistente Virtual">
       <svg viewBox="0 0 576 512" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M416 192c0-88.4-93.1-160-208-160S0 103.6 0 192c0 34.3 14.1 65.9 38 92-13.4 30.2-35.5 54.2-35.8 54.5-2.2 2.3-2.8 5.7-1.5 8.7S4.8 352 8 352c36.6 0 66.9-12.3 88.7-25 32.2 15.7 70.3 25 111.3 25 114.9 0 208-71.6 208-160zm122 220c23.9-26 38-57.7 38-92 0-66.9-53.5-124.2-129.3-148.1.9 6.6 1.3 13.3 1.3 20.1 0 105.9-107.7 192-240 192-10.8 0-21.3-.8-31.7-1.9C207.8 439.6 281.8 480 368 480c41 0 79.1-9.2 111.3-25 21.8 12.7 52.1 25 88.7 25 3.2 0 6.1-1.9 7.3-4.8 1.3-2.9.7-6.3-1.5-8.7-.3-.3-22.4-24.2-35.8-54.5z"/>
       </svg>
-    </button>
+  </button>
 
   <script>
     /* LÓGICA DO CHATBOT AUTOMÁTICO DO RTEC */
@@ -510,6 +520,7 @@
     let feedbacks = [];
     let erroMateriais = '';
     let filtroAtual = 'geral';
+    let feedbacksCarregados = false;
     const ENDERECO_COLETA = 'Ecoponto - Franco da Rocha/SP';
 
     const demoAgendamentos = [
@@ -523,8 +534,8 @@
       { id: 3, nome_material: 'Teclado', destino: 'coleta', status_processamento: 'Em Processo', monitor_nome: 'Ana Souza', data_cadastro: '2026-10-21' },
     ];
     const demoFeedbacks = [
-      { id: 1, avaliacao_estrelas: 5, recomendaria: 'sim', data_envio: '2026-10-20' },
-      { id: 2, avaliacao_estrelas: 4, recomendaria: 'sim', data_envio: '2026-10-19' },
+      { id_feedback: 1, avaliacao_estrelas: 5, recomendaria: 'sim', data_envio: '2026-10-20T14:00:00' },
+      { id_feedback: 2, avaliacao_estrelas: 4, recomendaria: 'sim', data_envio: '2026-10-19T10:30:00' },
     ];
 
     function formatData(iso) {
@@ -535,14 +546,13 @@
 
     async function carregarDados() {
       try {
-        const [rAgen, rMat, rFeed] = await Promise.all([
+        const [rAgen, rMat] = await Promise.all([
           _supabase.from('tbl_agendamento').select('*').order('data_agendada', { ascending: false }),
           _supabase.from('tbl_material_cadastrado').select('*, tbl_tipomaterial(nome_material), tbl_usuario(nome_usuario)').order('data_cadastro', { ascending: false }),
-          _supabase.from('tbl_feedback').select('*').order('data_envio', { ascending: false }),
         ]);
         
         if (rAgen.error) console.warn("Aviso Agendamentos:", rAgen.error);
-        // Se a busca com relacionamentos (join) falhar, tenta de novo só com a tabela principal
+        
         let dadosMat = rMat.data;
         erroMateriais = '';
         if (rMat.error) {
@@ -555,19 +565,16 @@
             dadosMat = r2.data;
           }
         }
-        if (rFeed.error) console.warn("Aviso Feedbacks:", rFeed.error);
 
         agendamentos = (rAgen.data || []).map(a => ({ ...a, nome_residuo: a.nome_residuo || 'Eletrônico', data_agendamento: a.data_agendada, hora_agendamento: a.hora_agendada }));
         materiais = (dadosMat || []).map(m => ({ ...m, nome_material: m.tbl_tipomaterial?.nome_material || m.nome_material || 'Material', monitor_nome: m.tbl_usuario?.nome_usuario || m.monitor_nome || 'Monitor' }));
-        feedbacks = rFeed.data || [];
         
         if (!agendamentos.length && !materiais.length) throw new Error('vazio');
       } catch (e) {
         DEMO_MODE = true;
         agendamentos = demoAgendamentos;
         materiais = demoMateriais;
-        // Só usa feedbacks de demonstração se der erro de verdade (não quando está só "vazio")
-        if (e.message !== 'vazio') feedbacks = demoFeedbacks;
+        feedbacks = demoFeedbacks;
         console.warn('Supabase indisponível — exibindo dados de demonstração.');
       }
       renderTudo();
@@ -607,7 +614,6 @@
         : '<p class="muted" style="text-align:center; padding:1rem 0;">Nenhuma doação recente.</p>';
 
       renderProtocolos();
-      renderFeedbacks();
       renderEducacional();
       aplicarFiltro(new URLSearchParams(location.search).get('filtro') || 'geral', true);
     }
@@ -688,23 +694,82 @@
       renderTudo();
     }
 
-    // Botão "Ver Todos": abre e fecha a lista maior, sem sair da página
-    let feedbacksAbertos = false;
-    document.getElementById('btnVerTodos').addEventListener('click', () => {
-      feedbacksAbertos = !feedbacksAbertos;
-      document.getElementById('listaFeedbacks').style.maxHeight = feedbacksAbertos ? '70vh' : '260px';
-      document.getElementById('btnVerTodos').textContent = feedbacksAbertos ? 'Ver Menos' : 'Ver Todos';
-    });
+    /* BUSCA E RENDERIZAÇÃO DOS FEEDBACKS DO SUPABASE */
+    async function toggleMostrarFeedbacks() {
+      const container = document.getElementById('listaFeedbacks');
+      const btn = document.getElementById('btnVerTodos');
 
-    function renderFeedbacks() {
-      document.getElementById('listaFeedbacks').innerHTML = feedbacks.length
-        ? feedbacks.map(f => `
-          <div style="padding: 1rem 0; border-bottom: 1px solid #e2e8f0;">
-            <div style="margin-bottom:0.375rem;">${[1,2,3,4,5].map(i => `<i class="fas fa-star ${i <= (f.avaliacao_estrelas || 0) ? 'star' : 'star-empty'}"></i>`).join('')}</div>
-            <p style="font-size:0.82rem;"><strong>Recomendaria:</strong> ${f.recomendaria === 'sim' ? 'Sim' : 'Não'}</p>
-            <p class="muted" style="font-size:0.72rem; margin-top:0.375rem;">Enviado em ${formatData(f.data_envio)}</p>
-          </div>`).join('')
-        : '<p class="muted" style="text-align:center; padding:1.5rem 0;">Nenhum feedback recebido ainda.</p>';
+      if (container.style.display === 'block') {
+        container.style.display = 'none';
+        btn.textContent = 'Ver Todos';
+      } else {
+        container.style.display = 'block';
+        btn.textContent = 'Ver Menos';
+
+        if (!feedbacksCarregados) {
+          container.innerHTML = '<p style="text-align:center; color:#64748b; padding:1rem;">Carregando avaliações...</p>';
+          try {
+            if (!DEMO_MODE) {
+              const { data, error } = await _supabase
+                .from('tbl_feedback')
+                .select('*')
+                .order('data_envio', { ascending: false });
+
+              if (error) throw error;
+              feedbacks = data || [];
+            }
+            feedbacksCarregados = true;
+            renderListaFeedbacks();
+          } catch (err) {
+            console.error('Erro ao buscar feedbacks:', err);
+            container.innerHTML = '<p style="text-align:center; color:#ef4444; padding:1rem;">Erro ao carregar os feedbacks do banco de dados.</p>';
+          }
+        } else {
+          renderListaFeedbacks();
+        }
+      }
+    }
+
+    function renderListaFeedbacks() {
+      const container = document.getElementById('listaFeedbacks');
+      if (!feedbacks || feedbacks.length === 0) {
+        container.innerHTML = '<p class="muted" style="text-align:center; padding:1rem;">Nenhuma avaliação cadastrada no sistema.</p>';
+        return;
+      }
+
+      container.innerHTML = feedbacks.map(f => {
+        const dataFormatada = f.data_envio 
+          ? new Date(f.data_envio).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+          : 'Data N/D';
+
+        let estrelasHtml = '';
+        for (let i = 1; i <= 5; i++) {
+          const isFull = i <= (f.avaliacao_estrelas || 0);
+          estrelasHtml += `<i class="fas fa-star ${isFull ? 'star' : 'star-empty'}"></i> `;
+        }
+
+        const recomendaBadge = (f.recomendaria && f.recomendaria.toLowerCase() === 'sim')
+          ? `<span class="feedback-badge recomenda"><i class="fas fa-thumbs-up"></i> Recomendou a plataforma</span>`
+          : `<span class="feedback-badge nao-recomenda"><i class="fas fa-thumbs-down"></i> Não recomendou</span>`;
+
+        return `
+          <div class="feedback-item">
+            <div class="feedback-item-header">
+              <div class="feedback-item-title">
+                <i class="fas fa-user-circle" style="color:#16a34a; font-size:1.1rem;"></i>
+                Avaliação #${f.id_feedback || f.id}
+              </div>
+              <span class="muted" style="font-size:0.75rem;">${dataFormatada}</span>
+            </div>
+            <div style="margin-bottom:0.5rem; font-size:1.1rem;">
+              ${estrelasHtml}
+            </div>
+            <div>
+              ${recomendaBadge}
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderEducacional() {
