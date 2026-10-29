@@ -150,6 +150,16 @@
     .modal-overlay.open { display: flex; }
     .modal-box { background: #ffffff; border-radius: 1.25rem; max-width: 26rem; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.75rem; position: relative; }
     body.dark-mode .modal-box { background: #1e293b; color: #f8fafc; }
+    /* Caixas de dentro do modal de protocolo (claro e escuro) */
+    .proto-num-box { background:#f0fdf4; border:2px solid #bbf7d0; border-radius:0.75rem; padding:0.875rem; margin-bottom:1rem; }
+    .proto-num-label { font-size:0.75rem; color:#64748b; }
+    .proto-info { text-align:left; background:#f8fafc; border-radius:0.75rem; padding:1rem; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem; color:#0f172a; }
+    .proto-info strong { color:#0f172a; }
+    body.dark-mode .proto-num-box { background:#14532d; border-color:#166534; }
+    body.dark-mode .proto-num-label { color:#bbf7d0; }
+    body.dark-mode .proto-info { background:#0f172a; border:1px solid #334155; color:#f8fafc; }
+    body.dark-mode .proto-info strong { color:#f8fafc; }
+    body.dark-mode .proto-info .muted { color:#94a3b8; }
     .modal-close { position: absolute; top: 0.75rem; right: 0.75rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #94a3b8; line-height: 1; }
 
     .star { color: #facc15; }
@@ -359,11 +369,11 @@
         </div>
         <h3 style="font-size:1.25rem; font-weight:800;">Detalhes do Protocolo</h3>
         <p class="muted" style="margin-bottom:1rem;">Informações completas da coleta agendada</p>
-        <div style="background:#f0fdf4; border:2px solid #bbf7d0; border-radius:0.75rem; padding:0.875rem; margin-bottom:1rem;">
-          <div style="font-size:0.75rem; color:#64748b;">Protocolo:</div>
+        <div class="proto-num-box">
+          <div class="proto-num-label">Protocolo:</div>
           <div id="protocoloNumero" style="font-size:1.375rem; font-weight:800; color:#16a34a; font-family:monospace;"></div>
         </div>
-        <div style="text-align:left; background:#f8fafc; border-radius:0.75rem; padding:1rem; margin-bottom:1rem; display:flex; flex-direction:column; gap:0.5rem; font-size:0.85rem;">
+        <div class="proto-info">
           <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">E-mail:</span><strong id="protocoloEmail" style="word-break:break-all;"></strong></div>
           <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">Resíduo:</span><strong id="protocoloResiduo"></strong></div>
           <div style="display:flex; justify-content:space-between; gap:0.5rem;"><span class="muted">Data:</span><strong id="protocoloData"></strong></div>
@@ -498,6 +508,7 @@
     let agendamentos = [];
     let materiais = [];
     let feedbacks = [];
+    let erroMateriais = '';
     let filtroAtual = 'geral';
     const ENDERECO_COLETA = 'Ecoponto - Franco da Rocha/SP';
 
@@ -531,11 +542,23 @@
         ]);
         
         if (rAgen.error) console.warn("Aviso Agendamentos:", rAgen.error);
-        if (rMat.error) console.warn("Aviso Materiais:", rMat.error);
+        // Se a busca com relacionamentos (join) falhar, tenta de novo só com a tabela principal
+        let dadosMat = rMat.data;
+        erroMateriais = '';
+        if (rMat.error) {
+          console.error('Erro Materiais (com join):', rMat.error);
+          const r2 = await _supabase.from('tbl_material_cadastrado').select('*');
+          if (r2.error) {
+            console.error('Erro Materiais (sem join):', r2.error);
+            erroMateriais = r2.error.message;
+          } else {
+            dadosMat = r2.data;
+          }
+        }
         if (rFeed.error) console.warn("Aviso Feedbacks:", rFeed.error);
 
         agendamentos = (rAgen.data || []).map(a => ({ ...a, nome_residuo: a.nome_residuo || 'Eletrônico', data_agendamento: a.data_agendada, hora_agendamento: a.hora_agendada }));
-        materiais = (rMat.data || []).map(m => ({ ...m, nome_material: m.tbl_tipomaterial?.nome_material || 'Material', monitor_nome: m.tbl_usuario?.nome_usuario || 'Monitor' }));
+        materiais = (dadosMat || []).map(m => ({ ...m, nome_material: m.tbl_tipomaterial?.nome_material || m.nome_material || 'Material', monitor_nome: m.tbl_usuario?.nome_usuario || m.monitor_nome || 'Monitor' }));
         feedbacks = rFeed.data || [];
         
         if (!agendamentos.length && !materiais.length) throw new Error('vazio');
@@ -686,9 +709,9 @@
 
     function renderEducacional() {
       document.getElementById('statMatTotal').textContent = materiais.length;
-      document.getElementById('statMatAula').textContent = materiais.filter(m => m.destino === 'aula' || m.id_tipo_destino === 2).length;
+      document.getElementById('statMatAula').textContent = materiais.filter(m => m.destino === 'aula' || Number(m.id_tipo_destino) === 2).length;
       document.getElementById('statMatPendente').textContent = materiais.filter(m => m.status_processamento === 'Em Espera').length;
-      document.getElementById('statMatColeta').textContent = materiais.filter(m => m.destino === 'coleta' || m.id_tipo_destino === 1).length;
+      document.getElementById('statMatColeta').textContent = materiais.filter(m => m.destino === 'coleta' || Number(m.id_tipo_destino) === 1).length;
 
       const contagem = {};
       materiais.forEach(m => { const k = m.nome_material || 'Outros'; contagem[k] = (contagem[k] || 0) + 1; });
@@ -701,6 +724,11 @@
               <div class="progress-track"><div class="progress-fill" style="width:${pct}%; background:${cores[i % 5]};"></div></div></div>`;
           }).join('')
         : '<p class="muted" style="text-align:center;">Nenhum material cadastrado.</p>';
+
+      if (erroMateriais) {
+        document.getElementById('listaTiposMaterial').innerHTML =
+          '<p style="color:#dc2626; font-size:0.82rem;">Erro ao buscar materiais no banco: ' + erroMateriais + '</p>';
+      }
 
       const porMes = {};
       materiais.forEach(m => {
@@ -729,7 +757,7 @@
           }).join('')
         : '<p class="muted" style="text-align:center;">Nenhum histórico mensal.</p>';
 
-      const paraAula = materiais.filter(m => m.destino === 'aula' || m.id_tipo_destino === 2).slice(0, 5);
+      const paraAula = materiais.filter(m => m.destino === 'aula' || Number(m.id_tipo_destino) === 2).slice(0, 5);
       document.getElementById('tbodyMateriais').innerHTML = paraAula.length
         ? paraAula.map(m => `<tr><td>${formatData(m.data_cadastro)}</td><td>${m.nome_material || 'N/D'}</td><td>${m.monitor_nome || 'N/D'}</td><td>${badgeStatus(m.status_processamento)}</td></tr>`).join('')
         : '<tr><td colspan="4" style="text-align:center;" class="muted">Nenhum material para aula.</td></tr>';
